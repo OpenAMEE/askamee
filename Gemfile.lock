@@ -1,5 +1,6 @@
 GEM
   remote: http://rubygems.org/
+  remote: http://amee:aeC5ahx4@gems.amee.com/
   specs:
     abstract (1.0.0)
     actionmailer (3.0.10)
