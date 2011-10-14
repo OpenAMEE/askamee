@@ -2,13 +2,18 @@
   You asked: <em>"<%= params[:question][:q]%>"</em>
 </p>
 <p>
-  I'm going to look for things related to <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %> that have <%= @quantities.map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %> as inputs.
+  I'm going to look for things related to <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %> that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %> as inputs.
 </p>
 <p>
   Here are a few categories that look relevant:
-  <ul>
+  <dl>
     <% @categories.each do |x| %>
-      <li><%= x[0].meta.wikiname %> <%= x[1].label %></li>
+      <dt><%= x[0].meta.wikiname %></dt>
+      <dd>
+        <%= x[1].label %><br/>
+        <%= x[2].name if x[2] %><br/>
+        <%= link_to "More info", "http://discover.amee.com/categories#{x[0].path}" %>
+      </dd>
     <% end %>
-  </ul>
+  </dl>
 </p>
