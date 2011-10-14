@@ -1,8 +1,8 @@
 Askamee::Application.routes.draw do
   get "question/new"
 
-  get "question/create"
-
+  post "question/answer"
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

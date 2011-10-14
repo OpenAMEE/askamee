@@ -1,2 +1,4 @@
-<h1>Question#new</h1>
-<p>Find me in app/views/question/new.html.erb</p>
+<% form_tag :action => 'answer' do %>
+  <%= text_field :question, :q %>
+  <%= submit_tag 'Ask' %>
+<% end %>
