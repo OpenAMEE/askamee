@@ -1,4 +1,5 @@
 source 'http://rubygems.org'
+source 'http://amee:aeC5ahx4@gems.amee.com'
 
 gem 'rails', '3.0.10'
 gem 'term-extract'
