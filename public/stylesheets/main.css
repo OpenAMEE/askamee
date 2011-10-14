@@ -38,3 +38,43 @@ div#ask {
 div#ask input {
 	font-size: 200%;
 }
+
+dt {
+	font-size: 110%;
+	font-weight: bold;
+	clear: both;
+}
+
+dd {
+	margin-bottom: 50px;
+}
+
+div.amount {
+	font-size: 150%;
+}
+
+div.details {
+	color: #777;
+}
+
+div.tellmemore {
+	float: right;
+	padding: 10px;
+	background: green;
+	font-size: 110%;
+	border-radius: 10px;
+}
+
+div.tellmemore a {
+	text-decoration: none;
+	font-weight: bold;
+	color: white;
+}
+
+div#question {
+	margin-bottom: 10px;
+}
+
+.userinput {
+	font-weight: bold;
+}

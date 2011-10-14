@@ -1,20 +1,21 @@
-<p>
-  You asked: <em>"<%= params[:question][:q]%>"</em>
-</p>
-<p>
-  I'm going to look for things related to <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %> that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %> as inputs.
-</p>
-<p>
+<div id='question'>
+  You asked: <span class='userinput'>"<%= params[:question][:q]%>"</span>
+</div>
+<div id='querydetails'>
+  I'm going to look for things related to <%= @terms.map{|x| "<span class='userinput'>#{h(x)}</span>"}.join(' and ').html_safe %> that have <%= [@quantity].map{|x| "<span class='userinput'>#{x.to_s}</span>"}.join(' and ').html_safe %> as inputs.
+</div>
+<div id='results'>
   Here are a few categories that look relevant:
   <dl>
     <% @categories.each do |x| %>
-      <dt><%= x[0].meta.wikiname %></dt>
+      <dt><%= x[0].meta.wikiname.titleize %></dt>
       <dd>
-        <%= x[1].label %><br/>
-        <%= x[2].name%><br/>
-        = <%= x[3].total_amount %>kg<br/>
-        <%= link_to "More info", "http://discover.amee.com/categories#{x[0].path}" %>
+        <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories#{x[0].path}" %></div>
+        <div class='amount'>= <%= x[3].total_amount %>kg</div>
+        <div class='details'>
+          Item <span class='item'>"<%= x[1].label %>"</span>, input parameter <span class='inputname'>"<%= x[2].name%>"</span>
+        </div>
       </dd>
     <% end %>
   </dl>
-</p>
+</div>
