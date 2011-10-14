@@ -8,7 +8,7 @@
   Here are a few categories that look relevant:
   <ul>
     <% @categories.each do |x| %>
-      <li><%= x.meta.wikiname %></li>
+      <li><%= x[0].meta.wikiname %> <%= x[1].label %></li>
     <% end %>
   </ul>
 </p>

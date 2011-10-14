@@ -25,7 +25,12 @@ class QuestionController < ApplicationController
       passing = x.meta.wikiname &&
         !x.meta.deprecated? && 
         x.item_definition
-      passing ? x : nil
+      item = passing ? x.data_items(:resultMax => 1, :matrix => 'label').first : nil
+      if passing && item
+        [x, item]
+      else
+        nil
+      end
     end
     
     
