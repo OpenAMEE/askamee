@@ -11,7 +11,8 @@
       <dt><%= x[0].meta.wikiname %></dt>
       <dd>
         <%= x[1].label %><br/>
-        <%= x[2].name if x[2] %><br/>
+        <%= x[2].name%><br/>
+        = <%= x[3].total_amount %>kg<br/>
         <%= link_to "More info", "http://discover.amee.com/categories#{x[0].path}" %>
       </dd>
     <% end %>

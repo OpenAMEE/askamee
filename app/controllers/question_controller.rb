@@ -20,6 +20,7 @@ class QuestionController < ApplicationController
     @terms.delete_if {|x| ignore.include? x }
     
     # Find some AMEE categories that look relevant
+    @profile = AMEE::Profile::ProfileList.new(AMEE::Rails.connection).first || AMEE::Profile::Profile.create(AMEE::Rails.connection)    
     @categories = AMEE::Search.new(AMEE::Rails.connection, :q => @terms.join(" "), :types=>'DC', :resultMax => 10, :matrix => 'itemDefinition;path', :excTags=>'ecoinvent') do |y|
       # Get category
       cat = y.result
@@ -34,9 +35,21 @@ class QuestionController < ApplicationController
       end
       # Get data item
       item = passing ? cat.data_items(:resultMax => 1, :matrix => 'label').first : nil
-      # Return results
+      # Do the calculation
+      pi = nil
       if passing && item && ivd
-        [cat, item, ivd]
+        pi = AMEE::Profile::Item.create_without_category(AMEE::Rails.connection,
+                                                         "/profiles/#{@profile.uid}#{cat.path}",
+                                                         item.uid,
+                                                         {
+                                                           ivd.path.to_sym => @quantity.value,
+                                                           :"#{ivd.path}Unit" => @quantity.unit.label,
+                                                           :name => UUIDTools::UUID.timestamp_create
+                                                         })
+      end
+      # Return results
+      if passing && item && ivd && pi
+        [cat, item, ivd, pi]
       else
         nil
       end
