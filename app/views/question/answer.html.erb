@@ -5,5 +5,10 @@
   I'm going to look for things related to <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %> that have <%= @quantities.map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %> as inputs.
 </p>
 <p>
-  Bear with me while I have a look around...
+  Here are a few categories that look relevant:
+  <ul>
+    <% @categories.each do |x| %>
+      <li><%= x.meta.wikiname %></li>
+    <% end %>
+  </ul>
 </p>

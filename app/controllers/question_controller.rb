@@ -18,6 +18,20 @@ class QuestionController < ApplicationController
       "impact"
     ]
     @terms.delete_if {|x| ignore.include? x }
+    
+    # Find some AMEE categories that look relevant
+    @categories = AMEE::Search.new(AMEE::Rails.connection, :q => @terms.join(" "), :types=>'DC', :resultMax => 10, :matrix => 'itemDefinition', :excTags=>'ecoinvent') do |y|
+      x = y.result
+      passing = x.meta.wikiname &&
+        !x.meta.deprecated? && 
+        x.item_definition
+      passing ? x : nil
+    end
+    
+    
+    #.find{|x| x.supports_auto_gallery? == true}
+    #puts category.map {|x| x.has_item_definition?}
+    
   end
 
 end

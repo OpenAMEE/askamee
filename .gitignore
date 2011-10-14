@@ -4,3 +4,4 @@ log/*.log
 tmp/
 
 database.yml
+/config/amee.yml
