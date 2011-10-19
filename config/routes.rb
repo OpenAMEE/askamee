@@ -2,6 +2,10 @@ Askamee::Application.routes.draw do
   get "question/new"
 
   post "question/answer"
+
+  match 'question/fetch_reading/:category' => 'question#fetch_reading'
+  
+
   
   # The priority is based upon order of creation:
   # first created -> highest priority.

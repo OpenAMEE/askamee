@@ -1,2 +1,8 @@
 
-$("#question").html("Updated content will be replaced here");
+$("#question").after("<%= escape_javascript(render :partial => 'question_details', :locals => { :terms => @terms, :quantity => @quantity } ) %>");
+
+
+
+<% @categories.each do |category| %>
+$.get("/question/fetch_reading/<%= category %>")
+<% end %>
