@@ -1,5 +1,5 @@
 <dt>
-  <%= @category.meta.wikiname %>
+  <%= @category.meta.wikiname.gsub("_"," ") %>
 </dt>
 <dd>
   <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories/#{@category.meta.wikiname}" %></div>
