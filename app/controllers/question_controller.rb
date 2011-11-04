@@ -26,17 +26,19 @@ class QuestionController < ApplicationController
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
-    @categories = AMEE::Search.new( AMEE::Rails.connection, :q => @terms.join(" "), :types=>'DC', :resultMax => 10, :matrix => 'itemDefinition;path', :excTags=>'ecoinvent' ) do |y|
-      y.result.meta.wikiname
+    unless @terms.empty?
+      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => @terms.join(" "), :types=>'DC', :resultMax => 10, :matrix => 'itemDefinition;path', :excTags=>'ecoinvent' ) do |y|
+        y.result.meta.wikiname
+      end
+      # Everything is stored in the session under a unique ID, as we'll need to come back to it later.
+      # The unique ID is used to avoid clashes when multiple queries happen in the same session
+      @query_id = UUIDTools::UUID.timestamp_create
+      session.clear
+      session[:quantity] = @quantity.to_s
+      session[:terms] = @terms
+      session[:categories] = @categories.to_a
+      @message = thinking_message
     end
-    # Everything is stored in the session under a unique ID, as we'll need to come back to it later.
-    # The unique ID is used to avoid clashes when multiple queries happen in the same session
-    @query_id = UUIDTools::UUID.timestamp_create
-    session.clear
-    session[:quantity] = @quantity.to_s
-    session[:terms] = @terms
-    session[:categories] = @categories.to_a
-    @message = thinking_message
   end
 
   def detailed_answer
@@ -45,9 +47,14 @@ class QuestionController < ApplicationController
     @profile = AMEE::Profile::ProfileList.new(AMEE::Rails.connection).first || AMEE::Profile::Profile.create(AMEE::Rails.connection)
 
     # Get category, filter out bad ones
-    @category = AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, session[:categories].delete_at(0), :matrix => 'itemDefinition;path')
+    @category = begin
+      AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, session[:categories].delete_at(0), :matrix => 'itemDefinition;path')
+    rescue AMEE::PermissionDenied
+      nil
+    end
 
-    @category = nil if (@category.meta.wikiname.blank? || 
+    @category = nil if (@category.nil? ||
+                        @category.meta.wikiname.blank? || 
                         @category.meta.deprecated?|| 
                         @category.item_definition.nil? || 
                         @category.meta.tags.include?("deprecated"))

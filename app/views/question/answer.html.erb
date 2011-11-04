@@ -6,6 +6,11 @@
 </div>
 <div>
   <dl id='results'>
-    <%= render :partial => 'thinking'%>
+    <% if session[:categories].size > 0 %>
+      <%= render :partial => 'thinking'%>
+    <% else %>
+      <dt>Sorry, no results found.</dt>
+      <dd>Maybe try a different question.</dd>
+    <% end %>
   </dl>
 </div>
