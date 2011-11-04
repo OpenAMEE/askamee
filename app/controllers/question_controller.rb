@@ -47,12 +47,13 @@ class QuestionController < ApplicationController
     # Get category, filter out bad ones
     @category = AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, session[:categories].delete_at(0), :matrix => 'itemDefinition;path')
 
-    passing = @category.meta.wikiname &&
-      !@category.meta.deprecated? &&
-      @category.item_definition
+    @category = nil if (@category.meta.wikiname.blank? || 
+                        @category.meta.deprecated?|| 
+                        @category.item_definition.nil? || 
+                        @category.meta.tags.include?("deprecated"))
 
     # Check IVD check that inputs are compatible with the units you've asked for
-    if passing
+    if @category
       ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
       ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
       @ivd = ivds.find{|x| x.unit && (@quantity.unit.label == x.unit || @quantity.unit.alternatives_by_label.include?(x.unit)) }
@@ -60,10 +61,10 @@ class QuestionController < ApplicationController
 
 
     # Get 1st data item (TODO make it get the _best_ one)
-    @item = passing ? @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } : nil
+    @item = @category ? @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } : nil
 
     # Do the calculation
-    if passing && @item && @ivd
+    if @category && @item && @ivd
 
       # create our profile item then get result back
       @pi = AMEE::Profile::Item.create_without_category(AMEE::Rails.connection,
@@ -85,7 +86,7 @@ class QuestionController < ApplicationController
       "Reticulating splines",
       "Peering through the intertubes",
       "Asking the cats",
-      "Enabling guru meditation",
+      "Empowering guru meditation",
       "Charging flux capacitor",
       "Reversing the polarity of the neutron flow",
       "Querying runes"
