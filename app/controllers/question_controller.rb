@@ -66,9 +66,11 @@ class QuestionController < ApplicationController
       @ivd = ivds.find{|x| x.unit && (@quantity.unit.label == x.unit || @quantity.unit.alternatives_by_label.include?(x.unit)) }
     end
 
-
-    # Get 1st data item (TODO make it get the _best_ one)
-    @item = @category ? @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } : nil
+    # Search for a data item
+    if @category
+      @item = AMEE::Search::WithinCategory.new( AMEE::Rails.connection, :label => @terms.join(" "), :wikiname=>@category.meta.wikiname, :resultMax => 1, :matrix => 'label').try(:first).try(:result)
+      @item = @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } if @item.nil?
+    end
 
     # Do the calculation
     if @category && @item && @ivd
@@ -96,7 +98,8 @@ class QuestionController < ApplicationController
       "Empowering guru meditation",
       "Charging flux capacitor",
       "Reversing the polarity of the neutron flow",
-      "Querying runes"
+      "Querying runes",
+      "Deploying ninjas"
     ].shuffle.first
   end
   
