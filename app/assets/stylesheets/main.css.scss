@@ -31,8 +31,12 @@ div.footer img {
 	float: right;
 }
 
-div#ask {
+div#ask, div#hint {
 	text-align: center;
+}
+
+div#ask {
+  margin-bottom: 20px;
 }
 
 div#ask input {

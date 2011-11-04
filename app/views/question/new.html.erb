@@ -1,10 +1,5 @@
-<div id='ask'>
-
-  <%= form_tag '/answer', :method => :get do %>
-    
-    <%= text_field_tag :q %>
-    <%= submit_tag 'Ask AMEE', :name => nil %>
-  <% end %>
+<%= render :partial => 'ask'%>
+<div id='hint'>
   <p>
     <strong>Hint:</strong> Try something like "100km in a car", "10kg of coal" or "42kWh of electricity"
   </p>
