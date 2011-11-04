@@ -1,6 +1,9 @@
 <div id='ask'>
-  <% form_tag :action => 'answer' do %>
-    <%= text_field :question, :q %>
-    <%= submit_tag 'Ask AMEE' %>
+
+  <%= form_tag '/answer', :method => :get do %>
+    
+    <%= text_field_tag :q %>
+    <%= submit_tag 'Ask AMEE', :name => nil %>
   <% end %>
+
 </div>

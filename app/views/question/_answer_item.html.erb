@@ -1,0 +1,17 @@
+<dt>
+  <%= @category.meta.wikiname %>
+</dt>
+<dd>
+  <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories/#{@category.meta.wikiname}" %></div>
+  <% if @pi -%>
+    <div class='amount'>= <%= @pi.total_amount %>kg</div>
+  <% end -%>
+  <% if @item && @ivd -%>
+    <div class='details'>
+      Item <span class='item'>"<%= @item.label %>"</span>, input parameter <span class='inputname'>"<%= @ivd.name%>"</span>
+    </div>
+  <% end -%>
+</dd>
+<% unless session[:categories].empty? %>
+  <%= render :partial => 'thinking'%>
+<% end %>
