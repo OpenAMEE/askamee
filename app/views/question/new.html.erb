@@ -1,14 +1,9 @@
 <div id='ask'>
 
-  <% form_tag '/question/answer', :remote => true do %>
+  <%= form_tag '/answer', :method => :get do %>
     
-    <%= text_field :question, :q %>
-    <%= submit_tag 'Ask AMEE' %>
+    <%= text_field_tag :q %>
+    <%= submit_tag 'Ask AMEE', :name => nil %>
   <% end %>
-</div>
 
-
-
-<div id='question'>
-  Replace me with text
 </div>

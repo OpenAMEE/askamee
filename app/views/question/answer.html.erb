@@ -1,21 +1,11 @@
 <div id='question'>
-  You asked: <span class='userinput'>"<%= params[:question][:q]%>"</span>
+  You asked: <span class='userinput'>"<%= params[:q] %>"</span>
 </div>
 <div id='querydetails'>
   I'm going to look for things related to <%= @terms.map{|x| "<span class='userinput'>#{h(x)}</span>"}.join(' and ').html_safe %> that have <%= [@quantity].map{|x| "<span class='userinput'>#{x.to_s}</span>"}.join(' and ').html_safe %> as inputs.
 </div>
-<div id='results'>
-  Here are a few categories that look relevant:
-  <dl>
-    <% @categories.each do |x| %>
-      <dt><%= x[0].meta.wikiname.titleize %></dt>
-      <dd>
-        <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories#{x[0].path}" %></div>
-        <div class='amount'>= <%= x[3].total_amount %>kg</div>
-        <div class='details'>
-          Item <span class='item'>"<%= x[1].label %>"</span>, input parameter <span class='inputname'>"<%= x[2].name%>"</span>
-        </div>
-      </dd>
-    <% end %>
+<div>
+  <dl id='results'>
+    <%= render :partial => 'thinking'%>
   </dl>
 </div>

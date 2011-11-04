@@ -1,9 +1,0 @@
-<% binding.pry %>
-  <dt><%= @category.meta.wikiname.titleize %></dt>
-  <dd>
-    <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories#{@category.path}" %></div>
-    <div class='amount'>= <%= @category[3].total_amount %>kg</div>
-    <div class='details'>
-      Item <span class='item'>"<%= @category[1].label %>"</span>, input parameter <span class='inputname'>"<%= @category[2].name%>"</span>
-    </div>
-  </dd>

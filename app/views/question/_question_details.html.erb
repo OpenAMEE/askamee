@@ -1,6 +1,0 @@
-<div id='question'>
-  You asked: <span class='userinput'>"<%= params[:question][:q]%>"</span>
-</div>
-<div id='querydetails'>
-  I'm going to look for things related to <%= terms.map{|x| "<span class='userinput'>#{h(x)}</span>"}.join(' and ').html_safe %> that have <%= [quantity].map{|x| "<span class='userinput'>#{x.to_s}</span>"}.join(' and ').html_safe %> as inputs.
-</div>

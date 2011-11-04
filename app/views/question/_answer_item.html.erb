@@ -1,7 +1,17 @@
+<dt>
+  <%= @category.meta.wikiname %>
+</dt>
 <dd>
-  <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories#{x[0].path}" %></div>
-  <div class='amount'>= <%= x[3].total_amount %>kg</div>
-  <div class='details'>
-    Item <span class='item'>"<%= x[1].label %>"</span>, input parameter <span class='inputname'>"<%= x[2].name%>"</span>
-  </div>
+  <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories/#{@category.meta.wikiname}" %></div>
+  <% if @pi -%>
+    <div class='amount'>= <%= @pi.total_amount %>kg</div>
+  <% end -%>
+  <% if @item && @ivd -%>
+    <div class='details'>
+      Item <span class='item'>"<%= @item.label %>"</span>, input parameter <span class='inputname'>"<%= @ivd.name%>"</span>
+    </div>
+  <% end -%>
 </dd>
+<% unless session[:categories].empty? %>
+  <%= render :partial => 'thinking'%>
+<% end %>
