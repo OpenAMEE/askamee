@@ -45,6 +45,10 @@ dt {
 	clear: both;
 }
 
+dt img {
+  vertical-align: bottom;
+}
+
 dd {
 	margin-bottom: 50px;
 }
@@ -53,7 +57,7 @@ div.amount {
 	font-size: 150%;
 }
 
-div.details {
+div.details, div.details a {
 	color: #777;
 }
 
