@@ -14,8 +14,11 @@ group :assets do
 end
 gem 'jquery-rails', '>= 1.0.12'
 
-group :development do
+group :development, :test do
   gem 'sqlite3'
   gem 'rspec-rails'
   gem 'pry'
+end
+group :production do
+  gem 'pg'
 end
