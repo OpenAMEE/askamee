@@ -60,7 +60,7 @@ class QuestionController < ApplicationController
 
 
     # Get 1st data item (TODO make it get the _best_ one)
-    @item = passing ? @category.data_items(:resultMax => 1, :matrix => 'label').first : nil
+    @item = passing ? @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } : nil
 
     # Do the calculation
     if passing && @item && @ivd
@@ -88,6 +88,7 @@ class QuestionController < ApplicationController
       "Enabling guru meditation",
       "Charging flux capacitor",
       "Reversing the polarity of the neutron flow",
+      "Querying runes"
     ].shuffle.first
   end
   
