@@ -7,21 +7,15 @@ class QuestionController < ApplicationController
   def answer
     # Get the query parameters out
     query = params[:q].split
-    # First, extract anything that Quantify can understand
-    content = query.map do |str|
-      begin
-        Quantity.parse str
-      rescue Quantify::Exceptions::QuantityParseError
-        str
-      end
-    end
-    @quantity = content.find{|x| x.is_a? Quantity}
+    @quantities = Quantity.parse(params[:q])
+    @quantity = @quantities.first
+    unit_terms = @quantities.map {|q| [q.unit.name, q.unit.pluralized_name, q.unit.symbol, q.unit.label]  }.flatten
     # Then run term extraction for interesting words
-    @terms = TermExtract.extract(content.select{|x| x.is_a? String}.join(' '), :min_occurance => 1).map{|x| x[0]}
+    @terms = TermExtract.extract(query.select{|x| x.is_a? String}.join(' '), :min_occurance => 1).map{|x| x[0]}
     ignore = [
       "emissions",
       "impact"
-    ]
+    ] + unit_terms
     @terms.delete_if {|x| ignore.include? x }
     # Find some AMEE categories that look relevant
     # Create new search for cat results
@@ -34,7 +28,7 @@ class QuestionController < ApplicationController
       # The unique ID is used to avoid clashes when multiple queries happen in the same session
       @query_id = UUIDTools::UUID.timestamp_create
       session.clear
-      session[:quantity] = @quantity.to_s
+      session[:quantity] = @quantity
       session[:terms] = @terms
       session[:categories] = @categories.to_a
       @message = thinking_message
@@ -43,7 +37,7 @@ class QuestionController < ApplicationController
 
   def detailed_answer
     @terms = session[:terms]
-    @quantity = Quantity.parse(session[:quantity])
+    @quantity = session[:quantity]
     @profile = AMEE::Profile::ProfileList.new(AMEE::Rails.connection).first || AMEE::Profile::Profile.create(AMEE::Rails.connection)
 
     # Get category, filter out bad ones

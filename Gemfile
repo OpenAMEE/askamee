@@ -3,7 +3,7 @@ source 'http://amee:aeC5ahx4@gems.amee.com'
 
 gem 'rails', '3.1.1'
 gem 'term-extract'
-gem 'quantify'
+gem 'quantify', '~>3.0'
 gem 'amee-internal', '~> 5.0'
 gem 'uuidtools'
 

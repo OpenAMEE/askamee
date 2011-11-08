@@ -2,6 +2,6 @@
 db/*.sqlite3
 log/*.log
 tmp/
-
+nbproject/
 database.yml
 /config/amee.yml
