@@ -5,6 +5,10 @@ class QuestionController < ApplicationController
   end
 
   def answer
+    # Save this search in the database
+    search = Search.find_by_string(params[:q]) || Search.new(:string => params[:q])
+    search.count += 1
+    search.save!
     # Get the query parameters out
     query = params[:q].split
     @quantities = Quantity.parse(params[:q])
