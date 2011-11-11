@@ -101,7 +101,8 @@ class QuestionController < ApplicationController
       "Charging flux capacitor",
       "Reversing the polarity of the neutron flow",
       "Casting runes",
-      "Deploying ninjas"
+      "Deploying ninjas",
+      "Collapsing waveforms"
     ].shuffle.first
   end
   
