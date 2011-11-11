@@ -1,6 +1,13 @@
-<%= render :partial => 'ask'%>
-<div id='hint'>
+<div class="hero-unit">
+  <h1>Ask AMEE</h1>
   <p>
-    <strong>Hint:</strong> Try something like "100km in a car", "10kg of coal" or "42kWh of electricity"
+    This is an experiment in making it quicker to get what you want from AMEE.
   </p>
+  <p>
+    Got a question for AMEE? Ask away! Try things like 
+    <%= link_to "100km in a car", "answer?q=100km+in+a+car" %>,
+    <%= link_to "10kg of coal", "answer?q=10kg+of+coal" %>,
+    <%= link_to "42kWh of electricity in the UK", "answer?q=42kWh+of+electricity+in+the+UK" %>.
+  </p>
+  <%= render :partial => 'ask'%>
 </div>

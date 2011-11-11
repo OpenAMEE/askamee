@@ -1,14 +1,19 @@
-<%= render :partial => 'ask'%>
-<div id='querydetails'>
-  OK, I'm going to look for things related to <%= @terms.map{|x| "<span class='userinput'>#{h(x)}</span>"}.join(' and ').html_safe %> that have <%= [@quantity].map{|x| "<span class='userinput'>#{x.to_s}</span>"}.join(' and ').html_safe %> as inputs.
+<div class='hero-unit'>
+  <%= render :partial => 'ask'%>
 </div>
-<div>
-  <dl id='results'>
+<div class="container">
     <% if session[:categories].size > 0 %>
+      <div class='alert-message info'>
+        OK, I'm going to look for things related to 
+        <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
+        that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
+        as inputs.
+      </div>
       <%= render :partial => 'thinking'%>
     <% else %>
-      <dt>Sorry, no results found.</dt>
-      <dd>Maybe try a different question.</dd>
+      <div class='alert-message error'>
+        Sorry, no results found. Maybe try a different question; 
+        make sure you include numbers, units and nouns.
+      </div>
     <% end %>
-  </dl>
 </div>

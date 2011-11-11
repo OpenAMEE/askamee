@@ -9,7 +9,7 @@ class QuestionController < ApplicationController
     query = params[:q].split
     @quantities = Quantity.parse(params[:q])
     @quantity = @quantities.first
-    unit_terms = @quantities.map {|q| [q.unit.name, q.unit.pluralized_name, q.unit.symbol, q.unit.label]  }.flatten
+    unit_terms = @quantities.map {|q| [q.unit.name, q.unit.pluralized_name, q.unit.symbol, q.unit.label] }.flatten
     # Then run term extraction for interesting words
     @terms = TermExtract.extract(query.select{|x| x.is_a? String}.join(' '), :min_occurance => 1).map{|x| x[0]}
     ignore = [
@@ -33,6 +33,9 @@ class QuestionController < ApplicationController
       session[:categories] = @categories.to_a
       @message = thinking_message
     end
+  rescue NoMethodError => ex
+    # Incuded to catch quantify parse errors
+    nil
   end
 
   def detailed_answer

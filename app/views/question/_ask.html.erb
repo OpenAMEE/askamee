@@ -3,6 +3,6 @@
   <%= form_tag '/answer', :method => :get do %>
     
     <%= text_field_tag :q, params[:q] %>
-    <%= submit_tag 'Ask AMEE', :name => nil %>
+    <%= submit_tag 'Ask AMEE', :name => nil, :class => 'btn primary' %>
   <% end %>
 </div>

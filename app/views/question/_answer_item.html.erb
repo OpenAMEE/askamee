@@ -1,25 +1,40 @@
 <% if @pi -%>
-  <dt>
-    <%= @category.meta.wikiname.gsub("_"," ") %>
-  </dt>
-  <dd>
-    <div class='tellmemore'><%= link_to "More info", "http://discover.amee.com/categories/#{@category.meta.wikiname}/data/#{@item.label.gsub(", ",'/')}/calculator" %></div>
-    <% if @pi.total_amount.to_f > 0.0 %>
-      <div class='amount'>
-        = <%= @pi.total_amount %>kg
-      </div>
-    <% else %>
-      <div>
-        This category needs a bit more information to give you an answer. Click 'more info' to dig deeper.
-      </div>
-    <% end %>
-    <div class='details'>
-      <% if @pi.total_amount.to_f > 0.0 && @item && @ivd -%>
-        Item <span class='item'>"<%= @item.label %>"</span>, input parameter <span class='inputname'>"<%= @ivd.name%>"</span><br/>
-      <% end -%>
-      Tags: <%= @category.meta.tags.map{|tag| "<a href='http://discover.amee.com/categories?tag=#{tag}'>#{tag}</a>" }.join(', ').html_safe %>
+  <div class="row">
+    <div class="span16">
+      <h3><%= link_to @category.meta.wikiname.gsub("_"," "), "http://discover.amee.com/categories/#{@category.meta.wikiname}" %></h3>
     </div>
-  </dd>
+  </div>
+  <div class="row">
+    <div class="span14">
+      <blockquote> 
+        <% if @pi.total_amount.to_f > 0.0 %>
+          <h4>
+            <% amount = @pi.amounts.find{|x| x[:default] == true}%>
+            <%= number_with_precision amount[:value], :precision => 2, :delimiter => ',' %>
+            <%= amount[:unit] %>
+            (<%= amount[:type] %>)
+          </h4>
+        <% else %>
+          <div>
+            This category needs a bit more information to give you an answer. Click 'more info' to dig deeper.
+          </div>
+        <% end %>
+        <% if @pi.total_amount.to_f > 0.0 && @item && @ivd -%>
+          <p>
+            Item <span class='item'>"<%= @item.label %>"</span>, input parameter <span class='inputname'>"<%= @ivd.name%>"</span>
+          </p>
+        <% end -%>
+        <small>
+          Tags: <%= @category.meta.tags.map{|tag| "<a href='http://discover.amee.com/categories?tag=#{tag}'>#{tag}</a>" }.join(', ').html_safe %>
+        </small>
+      </blockquote>
+    </div>
+    <div class="span2">
+      <%= link_to "More info", 
+                  "http://discover.amee.com/categories/#{@category.meta.wikiname}/data/#{@item.label.gsub(", ",'/')}/calculator",
+                  :class => 'btn primary' %>
+    </div>
+  </div>
 <% end %>
 <% unless session[:categories].empty? %>
   <%= render :partial => 'thinking'%>
