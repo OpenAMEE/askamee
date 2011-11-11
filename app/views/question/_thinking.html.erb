@@ -1,8 +1,10 @@
 <div class="row" id='thinking'>
   <div class="span16">
-    <%= @message %>... <%= image_tag "spinner.gif" %>
-    <script>
-      loadDetail();
-    </script>
+    <div class="alert-message warning">
+      <%= @message %>... <%= image_tag "spinner.gif" %>
+      <script>
+        loadDetail();
+      </script>
+    </div>
   </div>
 </div>
