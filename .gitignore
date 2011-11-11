@@ -5,3 +5,5 @@ tmp/
 nbproject/
 database.yml
 /config/amee.yml
+
+.DS_Store
