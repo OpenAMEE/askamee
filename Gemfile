@@ -24,6 +24,6 @@ group :development, :test do
 end
 group :production do
   gem 'pg'
-  gem 'rack-google_analytics', :require => "rack/google_analytics"
 end
 gem "devise"
+gem 'rack-google_analytics', :require => "rack/google_analytics"
