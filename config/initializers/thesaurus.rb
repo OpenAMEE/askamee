@@ -1,1 +1,1 @@
-THESAURUS = YAML.load_file("#{RAILS_ROOT}/config/thesaurus.yml")
+THESAURUS = YAML.load_file("#{Rails.root}/config/thesaurus.yml")
