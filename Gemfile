@@ -6,6 +6,7 @@ gem 'term-extract'
 gem 'quantify', '~>3.0'
 gem 'amee-internal', '~> 5.0'
 gem 'uuidtools'
+gem 'bootstrap-sass'
 
 group :assets do
   gem 'sass-rails',   '~> 3.1.4'
