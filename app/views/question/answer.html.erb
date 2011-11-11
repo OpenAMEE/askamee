@@ -11,9 +11,6 @@
       </div>
       <%= render :partial => 'thinking'%>
     <% else %>
-      <div class='alert-message error'>
-        Sorry, no results found. Maybe try a different question; 
-        make sure you include numbers, units and nouns.
-      </div>
+      <%= render :partial => 'no_results'%>
     <% end %>
 </div>

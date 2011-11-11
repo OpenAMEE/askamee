@@ -81,6 +81,7 @@ class QuestionController < ApplicationController
                                                          :"#{@ivd.path}Unit" => @quantity.unit.label,
                                                          :name => UUIDTools::UUID.timestamp_create
       })
+      session[:got_result] = true
     end
     @message = thinking_message
   end

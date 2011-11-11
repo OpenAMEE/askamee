@@ -57,3 +57,6 @@
 <% unless session[:categories].empty? %>
   <%= render :partial => 'thinking'%>
 <% end %>
+<% if session[:categories].empty? && session[:got_result].nil? %>
+  <%= render :partial => 'no_results'%>
+<% end %>
