@@ -7,6 +7,8 @@ gem 'quantify', '~>3.0'
 gem 'amee-internal', '~> 5.0'
 gem 'uuidtools'
 gem 'bootstrap-sass'
+gem 'fastercsv'
+gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git'
 
 group :assets do
   gem 'sass-rails',   '~> 3.1.4'
@@ -23,3 +25,4 @@ end
 group :production do
   gem 'pg'
 end
+gem "devise"
