@@ -50,3 +50,5 @@ module Askamee
     config.assets.version = '1.0'
   end
 end
+
+require 'lib/amee_patches'
