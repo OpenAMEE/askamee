@@ -22,4 +22,10 @@ div#ask {
 }
 
 div#ask input {
+  height: auto;
+  font-size: xx-large;
+}
+
+div#ask input[type=text] {
+  width: 500px;
 }
