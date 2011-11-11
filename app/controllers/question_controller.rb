@@ -89,10 +89,10 @@ class QuestionController < ApplicationController
       "Reticulating splines",
       "Peering through the intertubes",
       "Asking the cats",
-      "Empowering guru meditation",
+      "Commencing guru meditation",
       "Charging flux capacitor",
       "Reversing the polarity of the neutron flow",
-      "Querying runes",
+      "Casting runes",
       "Deploying ninjas"
     ].shuffle.first
   end
