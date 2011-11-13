@@ -1,6 +1,6 @@
 <% if @pi -%>
   <div class="row">
-    <div class="span16">
+    <div class="span16 total">
       <h3>
         <% if @pi.total_amount.to_f > 0.0 %>
           <% amount = @pi.amounts.find{|x| x[:default] == true}%>
@@ -11,6 +11,11 @@
           More information needed
         <% end %>
       </h3>
+    </div>
+    <div class="span2">
+      <%= link_to "More info", 
+                  discover_url(@category, @pi),
+                  :class => 'btn primary' %>
     </div>
   </div>
   <div class="row">
@@ -39,11 +44,7 @@
         <% end %>
       </blockquote>
     </div>
-    <div class="span2">
-      <%= link_to "More info", 
-                  discover_url(@category, @pi),
-                  :class => 'btn primary' %>
-    </div>
+    
   </div>
 <% end %>
 <% unless session[:categories].empty? %>

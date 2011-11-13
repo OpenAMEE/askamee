@@ -42,3 +42,73 @@ div#ask input {
 div#ask input[type=text] {
   width: 500px;
 }
+
+/**
+ * Mobile specific styles
+ *
+ * @section mobile
+ * Use media queries to change the width, to fit content on the pages better when 
+ * viewing with a mobile device like an iPhone or similar.
+ * 
+ */
+
+@media handheld and (max-device-width: 480px), screen and (max-width: 480px)  {
+
+  .container{
+    width:auto;
+  }
+
+  .fill a.brand{
+    margin-left:10px;
+    padding: 8px 6px 12px;
+
+  }
+
+  div.alert-message{
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  .span16{
+    width:auto;
+  }
+
+  .hero-unit{
+    padding: 12px
+  }
+
+
+  #ask form{
+    margin-bottom:6px;
+  }
+
+  div#ask input[type=text] {
+    width: auto;
+  }
+
+  div#ask input.btn {
+  display: block;
+  margin-top: 12px;
+  margin-left:20px;
+  }
+
+ .row {
+   margin-left:0px;
+ }
+
+ div.total{
+   width:230px;
+ }
+
+  .row a.btn{
+    margin-left:0px;
+    float:right;
+    margin-top: 0.5em;
+  }
+
+  footer img{
+    margin-right:12px;
+    margin-bottom:12px;    
+  }
+
+}
