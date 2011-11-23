@@ -44,6 +44,9 @@ GEM
       activesupport (= 3.1.1)
     activesupport (3.1.1)
       multi_json (~> 1.0)
+    airbrake (3.0.5)
+      activesupport
+      builder
     amee (4.1.7)
       activesupport (~> 3.0)
       json
@@ -183,6 +186,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  airbrake
   amee-internal (~> 5.0)
   bootstrap-sass
   coffee-rails (~> 3.1.1)
