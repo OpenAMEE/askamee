@@ -9,6 +9,7 @@ gem 'uuidtools'
 gem 'bootstrap-sass'
 gem 'fastercsv'
 gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git'
+gem "airbrake"
 
 group :assets do
   gem 'sass-rails',   '~> 3.1.4'
