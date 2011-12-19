@@ -26,12 +26,11 @@ class QuestionController < ApplicationController
       "impact"
     ] + unit_terms
     @terms.delete_if {|x| ignore.include? x }
-    thesaurus_expand(@terms.join(" "))
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
     unless @quantity.nil? || @terms.empty?
-      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :resultMax => 10, :matrix => 'itemDefinition;path', :excTags=>'ecoinvent' ) do |y|
+      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent' ) do |y|
         y.result.meta.wikiname
       end
       # Everything is stored in the session under a unique ID, as we'll need to come back to it later.
@@ -72,9 +71,11 @@ class QuestionController < ApplicationController
 
     # Check IVD check that inputs are compatible with the units you've asked for
     if @category
+      Rails.logger.info ('finding IVD')
       ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
       ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
       @ivd = ivds.find{|x| x.unit && (@quantity.unit.label == x.unit || @quantity.unit.alternatives_by_label.include?(x.unit)) }
+      Rails.logger.info ('found IVD') if @ivd
     end
 
     # Search for a data item
@@ -141,7 +142,6 @@ class QuestionController < ApplicationController
       end
       aexpanded=expanded.clone
       aexpanded.each do |e|
-        Rails.logger.debug "#{e},#{e.pluralize},#{e.singularize}"
         expanded<<e.pluralize unless e.pluralize==e if inflect
         expanded<<e.singularize unless e.singularize==e if inflect
       end
