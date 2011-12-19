@@ -44,10 +44,14 @@ class QuestionController < ApplicationController
   end
 
   def detailed_answer
+    @message = thinking_message
     @terms = session[:terms]
     @quantity = session[:quantity]
     @profile = AMEE::Profile::ProfileList.new(AMEE::Rails.connection).first || AMEE::Profile::Profile.create(AMEE::Rails.connection)
-
+    
+    # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
+    return if session[:categories].nil? || session[:categories].empty? || @terms.nil? || @quantity.nil?
+    
     # Get category, filter out bad ones
     @category = begin
       AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, session[:categories].delete_at(0), :matrix => 'itemDefinition;path')
@@ -88,7 +92,6 @@ class QuestionController < ApplicationController
       })
       session[:got_result] = true
     end
-    @message = thinking_message
   end
   
   protected
