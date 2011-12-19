@@ -71,11 +71,9 @@ class QuestionController < ApplicationController
 
     # Check IVD check that inputs are compatible with the units you've asked for
     if @category
-      Rails.logger.info ('finding IVD')
       ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
       ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
       @ivd = ivds.find{|x| x.unit && (@quantity.unit.label == x.unit || @quantity.unit.alternatives_by_label.include?(x.unit)) }
-      Rails.logger.info ('found IVD') if @ivd
     end
 
     # Search for a data item
