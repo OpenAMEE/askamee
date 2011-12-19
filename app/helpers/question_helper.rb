@@ -6,7 +6,9 @@ module QuestionHelper
 
   def discover_url(category, pi)
 
-    link = "http://discover.amee.com/categories/#{@category.meta.wikiname}/data/#{@item.label.gsub(", ",'/')}"
+    drills = @item.label.split(", ")
+    drills = drills.map{|x| URI.escape(x,/\//)}.map{|x| URI.escape(x)}
+    link = "http://discover.amee.com/categories/#{@category.meta.wikiname}/data/#{drills.join('/')}"
     if @pi.total_amount.to_f > 0.0
       values = @category.profile_ivds.map{|x|x.path}.map do |ppath|
         val = value(@pi,ppath)

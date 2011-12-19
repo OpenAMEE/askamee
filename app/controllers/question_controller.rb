@@ -5,6 +5,10 @@ class QuestionController < ApplicationController
   end
 
   def answer
+    # Reset the session data
+    session[:quantity] = nil
+    session[:terms] = nil
+    session[:categories] = nil
     # Save this search in the database
     search = Search.find_by_string(params[:q]) || Search.new(:string => params[:q])
     search.count += 1
@@ -13,6 +17,7 @@ class QuestionController < ApplicationController
     query = params[:q].split
     @quantities = Quantity.parse(params[:q])
     @quantity = @quantities.first
+    @quantity = nil if @quantity.unit.nil?
     unit_terms = @quantities.map {|q| [q.unit.name, q.unit.pluralized_name, q.unit.symbol, q.unit.label] }.flatten
     # Then run term extraction for interesting words
     @terms = TermExtract.extract(query.select{|x| x.is_a? String}.join(' '), :min_occurance => 1).map{|x| x[0]}
@@ -25,7 +30,7 @@ class QuestionController < ApplicationController
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
-    unless @terms.empty?
+    unless @quantity.nil? || @terms.empty?
       @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :resultMax => 10, :matrix => 'itemDefinition;path', :excTags=>'ecoinvent' ) do |y|
         y.result.meta.wikiname
       end
@@ -44,10 +49,14 @@ class QuestionController < ApplicationController
   end
 
   def detailed_answer
+    @message = thinking_message
     @terms = session[:terms]
     @quantity = session[:quantity]
     @profile = AMEE::Profile::ProfileList.new(AMEE::Rails.connection).first || AMEE::Profile::Profile.create(AMEE::Rails.connection)
-
+    
+    # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
+    return if session[:categories].nil? || session[:categories].empty? || @terms.nil? || @quantity.nil?
+    
     # Get category, filter out bad ones
     @category = begin
       AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, session[:categories].delete_at(0), :matrix => 'itemDefinition;path')
@@ -88,7 +97,6 @@ class QuestionController < ApplicationController
       })
       session[:got_result] = true
     end
-    @message = thinking_message
   end
   
   protected
