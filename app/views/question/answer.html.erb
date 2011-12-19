@@ -2,7 +2,7 @@
   <%= render :partial => 'ask'%>
 </div>
 <div class="container">
-    <% if session[:categories] && session[:categories].size > 0 && session[:quantity] %>
+    <% if session[:categories] && session[:categories].size > 0 && session[:quantity] && @terms %>
       <div class='alert-message info'>
         OK, I'm going to look for things related to 
         <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
