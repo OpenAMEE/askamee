@@ -30,7 +30,7 @@ class QuestionController < ApplicationController
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
     unless @quantity.nil? || @terms.empty?
-      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent' ) do |y|
+      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent', :resultMax => 30 ) do |y|
         y.result.meta.wikiname
       end
       # Everything is stored in the session under a unique ID, as we'll need to come back to it later.
