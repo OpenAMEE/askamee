@@ -4,11 +4,12 @@ source 'http://amee:aeC5ahx4@gems.amee.com'
 gem 'rails', '3.1.1'
 gem 'term-extract'
 gem 'quantify', '~>3.0'
+gem 'amee', :git => 'git@github.com:AMEE/amee-ruby', :branch => 'develop'
 gem 'amee-internal', '~> 5.0'
 gem 'uuidtools'
 gem 'bootstrap-sass'
 gem 'fastercsv'
-gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git'
+gem 'rails_admin', :git => 'https://github.com/sferik/rails_admin.git'
 gem "airbrake"
 
 group :assets do
