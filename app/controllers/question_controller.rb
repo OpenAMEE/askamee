@@ -1,5 +1,4 @@
 class QuestionController < ApplicationController
-  before_filter :get_profile
 
   def new
   end
@@ -51,7 +50,6 @@ class QuestionController < ApplicationController
     @message = thinking_message
     @terms = session[:terms]
     @quantity = session[:quantity]
-    @profile = AMEE::Profile::ProfileList.new(AMEE::Rails.connection).first || AMEE::Profile::Profile.create(AMEE::Rails.connection)
     
     # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
     return if session[:categories].nil? || session[:categories].empty? || @terms.nil? || @quantity.nil?
@@ -85,15 +83,12 @@ class QuestionController < ApplicationController
     # Do the calculation
     if @category && @item && @ivd
 
-      # create our profile item then get result back
-      @pi = AMEE::Profile::Item.create_without_category(AMEE::Rails.connection,
-                                                       "/profiles/#{@profile.uid}#{@category.path}",
-                                                       @item.uid,
-                                                       {
-                                                         @ivd.path.to_sym => @quantity.value,
-                                                         :"#{@ivd.path}Unit" => @quantity.unit.label,
-                                                         :name => UUIDTools::UUID.timestamp_create
-      })
+      @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
+                                 "/data#{@category.path}/#{@item.uid}",
+                                 {
+                                   @ivd.path.to_sym => @quantity.value,
+                                   :"#{@ivd.path}Unit" => @quantity.unit.label
+                                 })
       session[:got_result] = true
     end
   end
@@ -113,10 +108,6 @@ class QuestionController < ApplicationController
       "Collapsing waveforms"
     ].shuffle.first
   end
-  
-  def get_profile
-    @profile = (session[:profile] ||= AMEE::Profile::Profile.create(AMEE::Rails.connection))
-  end  
   
   def thesaurus_expand(query,inflect=true)
     terms=CSV::parse_line(query,' ') # so that quoted strings aren't tokenized
