@@ -36,10 +36,18 @@ class QuestionController < ApplicationController
       # The unique ID is used to avoid clashes when multiple queries happen in the same session
       @query_id = UUIDTools::UUID.timestamp_create
       session.clear
-      session[:quantity] = @quantity
+      session[:quantities] = [@quantity]
       session[:terms] = @terms
       session[:categories] = @categories.to_a
       @message = thinking_message
+      respond_to do |format|
+        format.html
+        format.json {
+          render :json => {
+            :categories => @categories, 
+            :terms => @terms, :quantities => [@quantity.to_s]}
+        }
+      end
     end
   rescue NoMethodError => ex
     # Incuded to catch quantify parse errors
@@ -47,16 +55,29 @@ class QuestionController < ApplicationController
   end
 
   def detailed_answer
+    # Split URL paramters if present
+    if params[:quantities]
+      params[:quantities] = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten
+    end
+    params[:terms] = params[:terms].split(',') if params[:terms]
+    
+    # Get parameters
     @message = thinking_message
-    @terms = session[:terms]
-    @quantity = session[:quantity]
+    @terms = params[:terms] || session[:terms]
+    @quantity = (params[:quantities] ? params[:quantities].first : session[:quantities].first)
     
     # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
-    return if session[:categories].nil? || session[:categories].empty? || @terms.nil? || @quantity.nil?
-    
+    return if @terms.nil? || @quantity.nil?
+
+    @category_name = params[:category]
+    if @category_name.nil?
+      return if session[:categories].nil? || session[:categories].empty?
+      @category_name = session[:categories].delete_at(0)
+    end
+        
     # Get category, filter out bad ones
     @category = begin
-      AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, session[:categories].delete_at(0), :matrix => 'itemDefinition;path')
+      AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, @category_name, :matrix => 'itemDefinition;path')
     rescue AMEE::PermissionDenied
       nil
     end
@@ -82,7 +103,6 @@ class QuestionController < ApplicationController
 
     # Do the calculation
     if @category && @item && @ivd
-
       @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
                                  "/data#{@category.path}/#{@item.uid}",
                                  {
@@ -90,6 +110,16 @@ class QuestionController < ApplicationController
                                    :"#{@ivd.path}Unit" => @quantity.unit.label
                                  })
       session[:got_result] = true
+    end
+    
+    respond_to do |format|
+      format.js
+      format.json {
+        render :json => {
+          :amount => (@pi ? @pi.total_amount : nil),
+          :item => (@pi ? @item.label : nil)
+        }
+      }
     end
   end
   
