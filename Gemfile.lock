@@ -1,18 +1,4 @@
 GIT
-  remote: git@github.com:AMEE/amee-ruby
-  revision: 16696fb720924e21895ce954708b0eda40675112
-  branch: develop
-  specs:
-    amee (4.3.2)
-      activesupport (>= 2.3.11)
-      appraisal
-      json
-      log4r
-      log_buddy
-      nokogiri (~> 1.4)
-      typhoeus
-
-GIT
   remote: https://github.com/sferik/rails_admin.git
   revision: bd9e1d21f5384b9cc4d401483ed1dd2e3637b7fb
   specs:
@@ -63,6 +49,14 @@ GEM
     airbrake (3.0.9)
       activesupport
       builder
+    amee (4.4.0)
+      activesupport (>= 2.3.11)
+      appraisal
+      json
+      log4r
+      log_buddy
+      nokogiri (~> 1.4)
+      typhoeus
     amee-internal (5.1.0)
       amee (~> 4.3)
     appraisal (0.4.0)
@@ -209,7 +203,7 @@ PLATFORMS
 
 DEPENDENCIES
   airbrake
-  amee!
+  amee (~> 4.4)
   amee-internal (~> 5.0)
   bootstrap-sass
   coffee-rails (~> 3.1.1)
