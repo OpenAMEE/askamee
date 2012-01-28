@@ -1,0 +1,1 @@
+<%= params[:callback]+'(' if params[:callback] -%>{"answer" : <%= (@pi ? @pi.total_amount : 'null') %>, "item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>}<%= ');' if params[:callback] -%>

@@ -1,0 +1,1 @@
+<%= params[:callback]+'(' if params[:callback] -%>{"categories" : [ <%= @categories.map{|x| "\"#{x}\"".html_safe}.join(',').html_safe  %> ],"terms" : [ <%= @terms.map{|x| "\"#{x}\"".html_safe}.join(',').html_safe  %> ],"quantities" : [ <%= @quantities.map{|x| "\"#{x.to_s}\"".html_safe}.join(',').html_safe  %> ]}<%= ');' if params[:callback] -%>
