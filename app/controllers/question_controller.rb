@@ -36,17 +36,13 @@ class QuestionController < ApplicationController
       # The unique ID is used to avoid clashes when multiple queries happen in the same session
       @query_id = UUIDTools::UUID.timestamp_create
       session.clear
-      session[:quantities] = [@quantity]
+      session[:quantities] = @quantities = [@quantity]
       session[:terms] = @terms
-      session[:categories] = @categories.to_a
+      session[:categories] = @categories = @categories.to_a
       @message = thinking_message
       respond_to do |format|
         format.html
-        format.json {
-          render :json => {
-            :categories => @categories, 
-            :terms => @terms, :quantities => [@quantity.to_s]}
-        }
+        format.json
       end
     end
   rescue NoMethodError => ex
@@ -114,12 +110,7 @@ class QuestionController < ApplicationController
     
     respond_to do |format|
       format.js
-      format.json {
-        render :json => {
-          :amount => (@pi ? @pi.total_amount : nil),
-          :item => (@pi ? @item.label : nil)
-        }
-      }
+      format.json
     end
   end
   
