@@ -28,6 +28,7 @@ class QuestionController < ApplicationController
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
+    @categories = []
     unless @quantity.nil? || @terms.empty?
       @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent', :resultMax => 30 ) do |y|
         y.result.meta.wikiname
@@ -47,6 +48,7 @@ class QuestionController < ApplicationController
     end
   rescue NoMethodError => ex
     # Incuded to catch quantify parse errors
+    @categories = @terms = @quantities = []
     nil
   end
 
