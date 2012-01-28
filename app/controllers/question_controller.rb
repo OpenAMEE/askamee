@@ -77,6 +77,7 @@ class QuestionController < ApplicationController
     @category = begin
       AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, @category_name, :matrix => 'itemDefinition;path')
     rescue AMEE::PermissionDenied
+      @private = true if params[:private] == true
       nil
     end
 
