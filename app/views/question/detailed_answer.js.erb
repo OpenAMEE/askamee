@@ -1,21 +1,21 @@
 <% if @pi && @pi.total_amount.to_f > 0.0 -%>
-	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'answer') %>");
-<% else %>
-  <% if @pi %>
-	  $("#more_info_container").slideDown();
-  	$("#more_info_list").append("<%= escape_javascript(render :partial => 'more_info') %>");
-	<% elsif @category %>
-    $("#wrong_dimension_container").slideDown();
-		$("#wrong_dimension_list").append("<%= escape_javascript(render :partial => 'wrong_dimensions') %>");
-	<% elsif @private == true %>
-		$("#private_list").append("<%= escape_javascript(render :partial => 'private') %>");
-	<% end %>
-	$("#thinking").replaceWith("");
+	$("#answerlist").append("<%= escape_javascript(render :partial => 'answer') %>");
+<% elsif @pi %>
+	$("#more_info_list").append("<%= escape_javascript(render :partial => 'more_info') %>");
+	$("#more_info_container").slideDown();
+<% elsif @category %>
+	$("#wrong_dimension_list").append("<%= escape_javascript(render :partial => 'wrong_dimensions') %>");
+	$("#wrong_dimension_container").slideDown();
+<% elsif @private == true %>
+	$("#private_list").append("<%= escape_javascript(render :partial => 'private') %>");
+	$("#private_container").slideDown();
 <% end %>
 
-<% unless session[:categories].empty? %>
-	$("#answerlist").append("<%= escape_javascript(render :partial => 'thinking') %>");
+<% if !session[:categories].empty? %>
+	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'thinking') %>");
+<% elsif session[:categories].empty? && session[:got_result] == true %>
+	$("#thinking").replaceWith("");
+<% else %>
+	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'no_results') %>");
 <% end %>
-<% if session[:categories].empty? && session[:got_result].nil? %>
-	$("#answerlist").append("<%= escape_javascript(render :partial => 'no_results') %>");
-<% end %>
+
