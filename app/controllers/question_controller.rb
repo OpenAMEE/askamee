@@ -108,14 +108,20 @@ class QuestionController < ApplicationController
 
     # Do the calculation
     if @category && @item && @ivd
-      opts = {
-        @ivd.path.to_sym => @quantity.value
-      }
-      opts[:"#{@ivd.path}Unit"] = @quantity.unit.label unless @quantity.unit.label.blank?
-      @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
-                                 "/data#{@category.path}/#{@item.uid}",
-                                 opts)
-      session[:got_result] = true
+      begin
+        opts = {
+          @ivd.path.to_sym => @quantity.value
+        }
+        opts[:"#{@ivd.path}Unit"] = @quantity.unit.label unless @quantity.unit.label.blank?
+        @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
+                                   "/data#{@category.path}/#{@item.uid}",
+                                   opts)
+        session[:got_result] = true
+      rescue AMEE::BadRequest => ex
+        # Something went wrong; notify about the result but let the user carry on
+        notify_airbrake(ex)
+        @category = nil
+      end
     end
     
     respond_to do |format|
