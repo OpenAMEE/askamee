@@ -91,7 +91,7 @@ class QuestionController < ApplicationController
     if @category
       ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
       ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
-      @ivd = ivds.find{|x| x.unit && (@quantity.unit.label == x.unit || @quantity.unit.alternatives_by_label.include?(x.unit)) }
+      @ivd = ivds.find{|x| (@quantity.unit.label == x.unit.to_s) || @quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
     end
 
     # Search for a data item
@@ -102,12 +102,13 @@ class QuestionController < ApplicationController
 
     # Do the calculation
     if @category && @item && @ivd
+      opts = {
+        @ivd.path.to_sym => @quantity.value
+      }
+      opts[:"#{@ivd.path}Unit"] = @quantity.unit.label unless @quantity.unit.label.blank?
       @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
                                  "/data#{@category.path}/#{@item.uid}",
-                                 {
-                                   @ivd.path.to_sym => @quantity.value,
-                                   :"#{@ivd.path}Unit" => @quantity.unit.label
-                                 })
+                                 opts)
       session[:got_result] = true
     end
     
