@@ -124,6 +124,8 @@ class QuestionController < ApplicationController
       end
     end
     
+    @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
+    
     respond_to do |format|
       format.js
       format.json
