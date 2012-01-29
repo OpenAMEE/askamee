@@ -14,17 +14,23 @@ class QuestionController < ApplicationController
     search.save!
     # Get the query parameters out
     query = params[:q].split
-    @quantities = Quantity.parse(params[:q])
+    @quantities, @terms = Quantity.parse(params[:q], :remainder => true)
     @quantity = @quantities.first
     @quantity = nil if @quantity.unit.nil?
-    unit_terms = @quantities.map {|q| [q.unit.name, q.unit.pluralized_name, q.unit.symbol, q.unit.label] }.flatten
     # Then run term extraction for interesting words
-    @terms = TermExtract.extract(query.select{|x| x.is_a? String}.join(' '), :min_occurance => 1).map{|x| x[0]}
+    # We might have separate strings between quantities, so join them all and re-split on space
+    @terms = @terms.join(' ').split(' ')
     ignore = [
       "emissions",
-      "impact"
-    ] + unit_terms
+      "impact",
+      "and",
+      "of",
+      "the",
+      "a",
+      "in"
+    ]
     @terms.delete_if {|x| ignore.include? x }
+    @terms.concat @quantities.select{|x| x.unit == Unit.dimensionless}.map{|x| x.value.to_i.to_s}
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
