@@ -1,15 +1,17 @@
+<% id = "answer_#{@category_name.downcase}" %>
 <% if @pi && @pi.total_amount.to_f > 0.0 -%>
-	$("#answerlist").append("<%= escape_javascript(render :partial => 'answer') %>");
+	$("#answerlist").append("<div id='<%=id%>' style='display:none'><%= escape_javascript(render :partial => 'answer') %></div>");
 <% elsif @pi %>
-	$("#more_info_list").append("<%= escape_javascript(render :partial => 'more_info') %>");
+	$("#more_info_list").append("<li id='<%=id%>' style='display:none'><%= escape_javascript(render :partial => 'more_info') %></li>");
 	$("#more_info_container").slideDown();
 <% elsif @category %>
-	$("#wrong_dimension_list").append("<%= escape_javascript(render :partial => 'wrong_dimensions') %>");
+	$("#wrong_dimension_list").append("<li id='<%=id%>' style='display:none'><%= escape_javascript(render :partial => 'wrong_dimensions') %></li>");
 	$("#wrong_dimension_container").slideDown();
 <% elsif @private == true %>
-	$("#private_list").append("<%= escape_javascript(render :partial => 'private') %>");
+	$("#private_list").append("<li id='<%=id%>' style='display:none'><%= escape_javascript(render :partial => 'private') %></li>");
 	$("#private_container").slideDown();
 <% end %>
+$("#<%=id%>").slideDown();
 
 <% if !session[:categories].empty? %>
 	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'thinking') %>");
