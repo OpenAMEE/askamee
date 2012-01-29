@@ -30,7 +30,7 @@ class QuestionController < ApplicationController
       "in"
     ]
     @terms.delete_if {|x| ignore.include? x }
-    @terms.concat @quantities.select{|x| x.unit == Unit.dimensionless}.map{|x| x.value.to_i.to_s}
+    @terms.concat @quantities.select{|x| x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.map{|x| x.value.to_i.to_s}
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
