@@ -1,0 +1,26 @@
+<div class="row">
+  <div class="span16">
+    <h3>
+	  Premium dataset
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="span14">
+    <blockquote> 
+      <p>
+        The category 
+        <%= link_to @category_name.gsub("_"," "), "http://discover.amee.com/categories/#{@category_name}" %>
+        looked relevant, but is unfortunately non-free data.
+      </p>
+      <p>
+        Click 'more info' to dig deeper.
+      </p>
+    </blockquote>
+  </div>
+  <div class="span2">
+    <%= link_to "More info", 
+                "http://discover.amee.com/categories/#{@category_name}",
+                :class => 'btn primary' %>
+  </div>
+</div>

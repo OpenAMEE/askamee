@@ -1,7 +1,7 @@
 <div class='hero-unit'>
   <%= render :partial => 'ask'%>
 </div>
-<div class="container">
+<div class="container" id="answerlist">
     <% if session[:categories] && session[:categories].size > 0 && session[:quantities] && session[:quantities].size > 0 && @terms %>
       <div class='alert-message info'>
         OK, I'm going to look for things related to 

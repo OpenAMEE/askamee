@@ -1,0 +1,31 @@
+<div class="row">
+  <div class="span16">
+    <h3>
+      <% amount = @pi.amounts.find{|x| x[:default] == true}%>
+      <%= number_with_precision amount[:value], :precision => 2, :delimiter => ',' %>
+      <%= amount[:unit] %> of 
+      <%= amount[:type] %>
+    </h3>
+  </div>
+</div>
+<div class="row">
+  <div class="span14">
+    <blockquote> 
+      <p>
+        based on '<%= @ivd.name.downcase %>' being <%= @quantity %>
+      </p>
+      <p>
+        using the item '<%= @item.label %>' 
+      </p>
+      <p>
+        from the category 
+        <%= link_to @category.meta.wikiname.gsub("_"," "), "http://discover.amee.com/categories/#{@category.meta.wikiname}" %>.
+      </p>
+    </blockquote>
+  </div>
+  <div class="span2">
+    <%= link_to "More info", 
+                discover_url(@category),
+                :class => 'btn primary' %>
+  </div>
+</div>

@@ -1,1 +1,18 @@
-$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'answer_item') %>");
+<% if @pi && @pi.total_amount.to_f > 0.0 -%>
+	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'answer') %>");
+<% elsif @pi %>
+	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'more_info') %>");
+<% elsif @category %>
+	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'wrong_dimensions') %>");
+<% elsif @private == true %>
+	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'private') %>");
+<% else %>
+	$("#thinking").replaceWith("");
+<% end %>
+
+<% unless session[:categories].empty? %>
+	$("#answerlist").append("<%= escape_javascript(render :partial => 'thinking') %>");
+<% end %>
+<% if session[:categories].empty? && session[:got_result].nil? %>
+	$("#answerlist").append("<%= escape_javascript(render :partial => 'no_results') %>");
+<% end %>
