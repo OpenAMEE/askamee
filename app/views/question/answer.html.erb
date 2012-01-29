@@ -1,16 +1,47 @@
+<% valid = session[:categories] && session[:categories].size > 0 && session[:quantities] && session[:quantities].size > 0 && @terms %>
 <div class='hero-unit'>
   <%= render :partial => 'ask'%>
 </div>
-<div class="container">
-    <% if session[:categories] && session[:categories].size > 0 && session[:quantities] && session[:quantities].size > 0 && @terms %>
-      <div class='alert-message info'>
-        OK, I'm going to look for things related to 
-        <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
-        that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
-        as inputs.
-      </div>
-      <%= render :partial => 'thinking'%>
-    <% else %>
-      <%= render :partial => 'no_results'%>
-    <% end %>
+<% if valid %>
+  <div class='alert-message info'>
+    OK, I'm going to look for things related to 
+    <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
+    that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
+    as inputs.
+  </div>
+<% end %>
+<div class='row'>
+	<div class="container span11" id="answerlist">
+	</div>
+	<div class="container span5">
+		<div class='alert-message block-message info' style='display:none' id='more_info_container'>
+		    <h3>
+		      More information needed
+		    </h3>
+			These categories look relevant, but need a bit more information to give you an answer:
+			<ul id="more_info_list">
+			</ul>
+		</div>
+		<div class='alert-message block-message info' style='display:none' id='wrong_dimension_container'>
+		    <h3>
+		      Couldn't match input units
+		    </h3>
+			These categories look relevant, but don't have any inputs of the right type:
+			<ul id="wrong_dimension_list">
+			</ul>
+		</div>		
+		<div class='alert-message block-message info' style='display:none' id='private_container'>
+		    <h3>
+		      Premium datasets
+		    </h3>
+			These categories look relevant, but are part of non-free datasets. Contact AMEE for more details:
+			<ul id="more_info_list">
+			</ul>
+		</div>
+	</div>
 </div>
+<% if valid %>
+  <%= render :partial => 'thinking'%>
+<% else %>
+  <%= render :partial => 'no_results'%>
+<% end %>

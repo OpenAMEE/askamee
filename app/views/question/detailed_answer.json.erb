@@ -1,1 +1,8 @@
-<%= params[:callback]+'(' if params[:callback] -%>{"answer" : <%= (@pi ? @pi.total_amount : 'null') %>, "item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, "item_uid" : <%= (@pi ? ('"'+@item.uid+'"').html_safe : 'null') %>}<%= ');' if params[:callback] -%>
+<%= params[:callback]+'(' if params[:callback] -%>{
+	"answer" : <%= (@pi ? number_with_precision(@amount[:value], :precision => 2, :delimiter => ',') : 'null') %>, 
+	"unit" : <%= (@pi ? "\"#{@amount[:unit]}\"".html_safe : 'null') %>, 
+	"type" : <%= (@pi ? "\"#{@amount[:type]}\"".html_safe : 'null') %>, 
+	"item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, 
+	"item_uid" : <%= (@pi ? ('"'+@item.uid+'"').html_safe : 'null') %>, 
+	"inputs" : <%= (@pi ? ('{"'+@ivd.name+'":"'+@quantity.to_s+'"}').html_safe : 'null') %>
+}<%= ');' if params[:callback] -%>

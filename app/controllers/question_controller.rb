@@ -14,17 +14,23 @@ class QuestionController < ApplicationController
     search.save!
     # Get the query parameters out
     query = params[:q].split
-    @quantities = Quantity.parse(params[:q])
+    @quantities, @terms = Quantity.parse(params[:q], :remainder => true)
     @quantity = @quantities.first
     @quantity = nil if @quantity.unit.nil?
-    unit_terms = @quantities.map {|q| [q.unit.name, q.unit.pluralized_name, q.unit.symbol, q.unit.label] }.flatten
     # Then run term extraction for interesting words
-    @terms = TermExtract.extract(query.select{|x| x.is_a? String}.join(' '), :min_occurance => 1).map{|x| x[0]}
+    # We might have separate strings between quantities, so join them all and re-split on space
+    @terms = @terms.join(' ').split(' ')
     ignore = [
       "emissions",
-      "impact"
-    ] + unit_terms
+      "impact",
+      "and",
+      "of",
+      "the",
+      "a",
+      "in"
+    ]
     @terms.delete_if {|x| ignore.include? x }
+    @terms.concat @quantities.select{|x| x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.map{|x| x.value.to_i.to_s}
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
@@ -77,6 +83,7 @@ class QuestionController < ApplicationController
     @category = begin
       AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, @category_name, :matrix => 'itemDefinition;path')
     rescue AMEE::PermissionDenied
+      @private = true if params[:private] == true
       nil
     end
 
@@ -90,7 +97,7 @@ class QuestionController < ApplicationController
     if @category
       ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
       ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
-      @ivd = ivds.find{|x| x.unit && (@quantity.unit.label == x.unit || @quantity.unit.alternatives_by_label.include?(x.unit)) }
+      @ivd = ivds.find{|x| (@quantity.unit.label == x.unit.to_s) || @quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
     end
 
     # Search for a data item
@@ -101,14 +108,23 @@ class QuestionController < ApplicationController
 
     # Do the calculation
     if @category && @item && @ivd
-      @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
-                                 "/data#{@category.path}/#{@item.uid}",
-                                 {
-                                   @ivd.path.to_sym => @quantity.value,
-                                   :"#{@ivd.path}Unit" => @quantity.unit.label
-                                 })
-      session[:got_result] = true
+      begin
+        opts = {
+          @ivd.path.to_sym => @quantity.value
+        }
+        opts[:"#{@ivd.path}Unit"] = @quantity.unit.label unless @quantity.unit.label.blank?
+        @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
+                                   "/data#{@category.path}/#{@item.uid}",
+                                   opts)
+        session[:got_result] = true
+      rescue AMEE::BadRequest => ex
+        # Something went wrong; notify about the result but let the user carry on
+        notify_airbrake(ex)
+        @category = nil
+      end
     end
+    
+    @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
     
     respond_to do |format|
       format.js

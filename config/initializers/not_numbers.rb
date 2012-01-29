@@ -1,0 +1,1 @@
+NOT_NUMBERS = YAML.load_file("#{Rails.root}/config/not_numbers.yml")
