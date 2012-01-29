@@ -1,12 +1,15 @@
 <% if @pi && @pi.total_amount.to_f > 0.0 -%>
 	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'answer') %>");
-<% elsif @pi %>
-	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'more_info') %>");
-<% elsif @category %>
-	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'wrong_dimensions') %>");
-<% elsif @private == true %>
-	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'private') %>");
 <% else %>
+  <% if @pi %>
+	  $("#more_info_container").slideDown();
+  	$("#more_info_list").append("<%= escape_javascript(render :partial => 'more_info') %>");
+	<% elsif @category %>
+    $("#wrong_dimension_container").slideDown();
+		$("#wrong_dimension_list").append("<%= escape_javascript(render :partial => 'wrong_dimensions') %>");
+	<% elsif @private == true %>
+		$("#private_list").append("<%= escape_javascript(render :partial => 'private') %>");
+	<% end %>
 	$("#thinking").replaceWith("");
 <% end %>
 

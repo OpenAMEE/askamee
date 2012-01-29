@@ -42,3 +42,22 @@ div#ask input {
 div#ask input[type=text] {
   width: 500px;
 }
+
+div.alert-message.block-message.info {
+  background-color: #f8f8f8;
+  border: 1px solid whiteSmoke;
+  color: #aaa;
+}
+
+div.alert-message.block-message.info h3, div.alert-message.block-message.info a {
+  color: #aaa;
+}
+
+div.alert-message.block-message.info h3, div.alert-message.block-message.info li {
+  list-style-type: none;
+  margin-bottom: 3px;
+}
+
+div.alert-message.block-message.info ul {
+  margin-top: 10px;
+}

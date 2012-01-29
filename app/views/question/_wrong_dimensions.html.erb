@@ -1,26 +1,5 @@
-<div class="row">
-  <div class="span16">
-    <h3>
-			Couldn't match input units
-    </h3>
-  </div>
-</div>
-<div class="row">
-  <div class="span14">
-    <blockquote> 
-      <p>
-        The category 
-        <%= link_to @category.meta.wikiname.gsub("_"," "), "http://discover.amee.com/categories/#{@category.meta.wikiname}" %>
-        looks relevant, but didn't have any input values with the right units.
-      </p>
-      <p>
-        Click 'more info' to dig deeper.
-      </p>
-    </blockquote>
-  </div>
-  <div class="span2">
-    <%= link_to "More info", 
-                discover_url(@category, @pi),
-                :class => 'btn primary' %>
-  </div>
-</div>
+<li>
+    <%= link_to @category.meta.wikiname.gsub("_"," "), 
+                discover_url(@category, @pi)
+		%>
+</li>
