@@ -150,6 +150,7 @@ class QuestionController < ApplicationController
   
   def thesaurus_expand(query,inflect=true)
     terms=CSV::parse_line(query,' ') # so that quoted strings aren't tokenized
+    terms = terms.map{|x| x.singularize}
     finalterms=[]
     terms.each do |term|
       next unless term
