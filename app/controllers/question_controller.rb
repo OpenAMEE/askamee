@@ -27,7 +27,7 @@ class QuestionController < ApplicationController
                                       :q => thesaurus_expand(@terms.join(" ")), 
                                       :types=>'DC', 
                                       :matrix => 'itemDefinition;path', 
-                                      :excTags=>'ecoinvent') { |y|
+                                      :excTags=>'ecoinvent,deprecated') { |y|
         y.result.meta.wikiname
       }.to_a
     end
@@ -69,9 +69,7 @@ class QuestionController < ApplicationController
 
     @category = nil if (@category.nil? ||
                         @category.meta.wikiname.blank? || 
-                        @category.meta.deprecated?|| 
-                        @category.item_definition.nil? || 
-                        @category.meta.tags.include?("deprecated"))
+                        @category.item_definition.nil?)
 
     # Check IVD check that inputs are compatible with the units you've asked for
     if @category
