@@ -24,5 +24,11 @@ describe QuestionController do
                                         "Freight_transport_by_Greenhouse_Gas_Protocol" ]
     end
 
+    it "assigns a thinking message" do
+      get :answer, :q => 'shipping 10 tonnes of stuff for 1000 kilometres'
+      assigns(:message).should_not be_blank
+    end
+
+
   end
 end
