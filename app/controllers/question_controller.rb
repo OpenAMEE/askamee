@@ -33,12 +33,6 @@ class QuestionController < ApplicationController
       }.to_a
     end
     
-    # Store in session (soon to be removed)
-    session.clear
-    session[:categories] = @categories
-    session[:terms] = @terms
-    session[:quantities] = @quantities
-    
     # Render
     respond_to do |format|
       format.html {
@@ -58,17 +52,13 @@ class QuestionController < ApplicationController
     
     # Get parameters
     @message = thinking_message
-    @terms = params[:terms] || session[:terms]
-    @quantity = (params[:quantities] ? params[:quantities].first : session[:quantities].first)
+    @terms = params[:terms]
+    @quantity = params[:quantities].first
     
     # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
     return if @terms.nil? || @quantity.nil?
 
     @category_name = params[:category]
-    if @category_name.nil?
-      return if session[:categories].nil? || session[:categories].empty?
-      @category_name = session[:categories].delete_at(0)
-    end
         
     # Get category, filter out bad ones
     @category = begin

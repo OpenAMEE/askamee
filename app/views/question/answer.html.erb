@@ -42,6 +42,11 @@
 	</div>
 </div>
 <% if valid %>
+  <script>
+	<% @categories.each do |cat| %>
+      loadDetail('<%= cat %>', '<%= @quantities.map{|x| x.to_s}.join(',') %>', '<%= @terms.join(',') %>');
+    <% end %>
+  </script>
   <%= render :partial => 'thinking'%>
 <% else %>
   <%= render :partial => 'no_results'%>
