@@ -12,29 +12,14 @@ class QuestionController < ApplicationController
     search = Search.find_by_string(params[:q]) || Search.new(:string => params[:q])
     search.count += 1
     search.save!
-    # Get the query parameters out
-    query = params[:q].split
-    @quantities, @terms = Quantity.parse(params[:q], :remainder => true)
-    @quantity = @quantities.first
-    @quantity = nil if @quantity.unit.nil?
-    # Then run term extraction for interesting words
-    # We might have separate strings between quantities, so join them all and re-split on space
-    @terms = @terms.join(' ').split(' ')
-    ignore = [
-      "emissions",
-      "impact",
-      "and",
-      "of",
-      "the",
-      "a",
-      "in"
-    ]
-    @terms.delete_if {|x| ignore.include? x }
-    @terms.concat @quantities.select{|x| x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.map{|x| x.value.to_i.to_s}
+
+    @quantities, @terms = parse_query(params[:q])
+
     # Find some AMEE categories that look relevant
     # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
     @categories = []
+    @quantity = @quantities.first
     unless @quantity.nil? || @terms.empty?
       @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent', :resultMax => 30 ) do |y|
         y.result.meta.wikiname
@@ -52,10 +37,6 @@ class QuestionController < ApplicationController
         format.json
       end
     end
-  rescue NoMethodError => ex
-    # Incuded to catch quantify parse errors
-    @categories = @terms = @quantities = []
-    nil
   end
 
   def detailed_answer
@@ -184,6 +165,38 @@ class QuestionController < ApplicationController
       return "+(#{terms.join(" ")})" if operator=="+"&&terms.length>1
       return "+#{terms.first}" if operator=="+"
       return "-#{terms.join(" -")}" if operator=="-"
+  end
+
+  # QUERY PARSER - EXTRACT TO LIB AT SOME POINT
+
+  # Takes a search string and parses it into a combination of inputs and search terms
+  def parse_query(q)
+    # Parse quantities first
+    begin 
+      quantities, terms = Quantity.parse(q, :remainder => true)
+    rescue NoMethodError => ex
+      # Incuded to catch quantify parse errors
+      quantities = []
+      terms = q
+    end
+    # Re-marshal terms into an array split on space
+    terms = terms.map{|x| x.split(' ')}.flatten
+    # Ignore common words
+    ignore = [
+      "emissions",
+      "impact",
+      "and",
+      "of",
+      "the",
+      "a",
+      "in"
+    ]
+    terms.delete_if {|x| ignore.include? x }
+    # Add dimensionless quantities if they are in the NOT_NUMBERS list
+    # This allows terms like '747'
+    terms.concat quantities.select{|x| x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.map{|x| x.value.to_i.to_s}
+    # All done, carry on.
+    return quantities, terms
   end
 
 end
