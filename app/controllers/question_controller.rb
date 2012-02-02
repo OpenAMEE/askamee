@@ -90,7 +90,6 @@ class QuestionController < ApplicationController
         @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
                                    "/data#{@category.path}/#{@item.uid}",
                                    opts)
-        session[:got_result] = true
       rescue AMEE::BadRequest => ex
         # Something went wrong; notify about the result but let the user carry on
         notify_airbrake(ex)

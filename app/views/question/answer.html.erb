@@ -43,6 +43,8 @@
 </div>
 <% if valid %>
   <script>
+    var responsesLeft = <%= @categories.size %>;
+	var gotResult = false;
 	<% @categories.each do |cat| %>
       loadDetail('<%= cat %>', '<%= @quantities.map{|x| x.to_s}.join(',') %>', '<%= @terms.join(',') %>');
     <% end %>

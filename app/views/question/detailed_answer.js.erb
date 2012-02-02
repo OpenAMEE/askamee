@@ -1,6 +1,7 @@
 <% id = "answer_#{@category_name.downcase}" %>
 <% if @pi && @pi.total_amount.to_f > 0.0 -%>
 	$("#answerlist").append("<div id='<%=id%>' style='display:none'><%= escape_javascript(render :partial => 'answer') %></div>");
+	gotResult = true;
 <% elsif @pi %>
 	$("#more_info_list").append("<li id='<%=id%>' style='display:none'><%= escape_javascript(render :partial => 'more_info') %></li>");
 	$("#more_info_container").slideDown();
@@ -13,11 +14,12 @@
 <% end %>
 $("#<%=id%>").slideDown();
 
-<% if !session[:categories].empty? %>
+responsesLeft -= 1;
+
+if (responsesLeft > 0)
 	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'thinking') %>");
-<% elsif session[:categories].empty? && session[:got_result] == true %>
+else if (gotResult == true)
 	$("#thinking").replaceWith("");
-<% else %>
+else
 	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'no_results') %>");
-<% end %>
 
