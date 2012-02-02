@@ -31,6 +31,14 @@ describe QueryParser do
       :inputs => ['1.0 '],
       :terms => ['long', 'haul', 'flight']
     },
+    'fly from london to new york' => {
+      :inputs => ['from:london', 'to:new york'],
+      :terms => ['fly']
+    },
+    'fly from new york to london' => {
+      :inputs => ['from:new york', 'to:london'],
+      :terms => ['fly']
+    },
         
   }.each_pair do |query, results|
     
