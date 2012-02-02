@@ -1,4 +1,4 @@
-<% valid = session[:categories] && session[:categories].size > 0 && session[:quantities] && session[:quantities].size > 0 && @terms %>
+<% valid = !@categories.empty? && !@quantities.empty? && !@terms.empty? %>
 <div class='hero-unit'>
   <%= render :partial => 'ask'%>
 </div>
@@ -6,7 +6,7 @@
   <div class='alert-message info'>
     OK, I'm going to look for things related to 
     <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
-    that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
+    that have <%= @quantities.map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
     as inputs.
   </div>
 <% end %>

@@ -10,10 +10,7 @@ class QuestionController < ApplicationController
   end
 
   def answer
-    # Reset the session data
-    session[:quantity] = nil
-    session[:terms] = nil
-    session[:categories] = nil
+    
     # Save this search in the database
     search = Search.find_by_string(params[:q]) || Search.new(:string => params[:q])
     search.count += 1
@@ -23,27 +20,33 @@ class QuestionController < ApplicationController
     @quantities, @terms = parse_query(params[:q])
 
     # Find some AMEE categories that look relevant
-    # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
     @categories = []
-    @quantity = @quantities.first
-    unless @quantity.nil? || @terms.empty?
-      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent', :resultMax => 30 ) do |y|
+    unless @quantities.empty? || @terms.empty?
+      @categories = AMEE::Search.new( AMEE::Rails.connection, 
+                                      :q => thesaurus_expand(@terms.join(" ")), 
+                                      :types=>'DC', 
+                                      :matrix => 'itemDefinition;path', 
+                                      :excTags=>'ecoinvent',
+                                      :resultMax => 30 ) { |y|
         y.result.meta.wikiname
-      end
-      # Everything is stored in the session under a unique ID, as we'll need to come back to it later.
-      # The unique ID is used to avoid clashes when multiple queries happen in the same session
-      @query_id = UUIDTools::UUID.timestamp_create
-      session.clear
-      session[:quantities] = @quantities = [@quantity]
-      session[:terms] = @terms
-      session[:categories] = @categories = @categories.to_a
-      @message = thinking_message
-      respond_to do |format|
-        format.html
-        format.json
-      end
+      }.to_a
     end
+    
+    # Store in session (soon to be removed)
+    session.clear
+    session[:categories] = @categories
+    session[:terms] = @terms
+    session[:quantities] = @quantities
+    
+    # Render
+    respond_to do |format|
+      format.html {
+        @message = thinking_message        
+      }
+      format.json
+    end
+    
   end
 
   def detailed_answer
