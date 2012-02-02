@@ -28,7 +28,7 @@ class QuestionController < ApplicationController
                                       :types=>'DC', 
                                       :matrix => 'itemDefinition;path', 
                                       :excTags=>'ecoinvent,deprecated') { |y|
-        y.result.meta.wikiname
+        y.result.meta.wikiname && y.result.itemdef.present? ? y.result.meta.wikiname : nil
       }.to_a
     end
     
@@ -66,10 +66,6 @@ class QuestionController < ApplicationController
       @private = true if params[:private] == true
       nil
     end
-
-    @category = nil if (@category.nil? ||
-                        @category.meta.wikiname.blank? || 
-                        @category.item_definition.nil?)
 
     # Check IVD check that inputs are compatible with the units you've asked for
     if @category
