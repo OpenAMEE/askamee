@@ -27,8 +27,7 @@ class QuestionController < ApplicationController
                                       :q => thesaurus_expand(@terms.join(" ")), 
                                       :types=>'DC', 
                                       :matrix => 'itemDefinition;path', 
-                                      :excTags=>'ecoinvent',
-                                      :resultMax => 30 ) { |y|
+                                      :excTags=>'ecoinvent') { |y|
         y.result.meta.wikiname
       }.to_a
     end
