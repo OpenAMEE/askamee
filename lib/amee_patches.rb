@@ -18,8 +18,8 @@ module AMEE
     
     class Item
       
-      def find_value(path)
-        values.find{ |x| x[:path] == path}
+      def find_input_value(path)
+        choices.find{ |x| x[:name] == path}
       end
       
     end

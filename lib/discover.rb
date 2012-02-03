@@ -8,12 +8,12 @@ module AMEE
       link = "http://discover.amee.com/categories/#{@category.meta.wikiname}/data/#{drills.join('/')}"
       if pi && pi.total_amount.to_f > 0.0
         values = category.profile_ivds.map{|x|x.path}.map do |ppath|
-          val = pi.find_value(ppath)
+          val = pi.find_input_value(ppath)
           str = 'none'
           if val && val[:value].present?
             str = val[:value]
-            unit = val[:unit]
-            per_unit = val[:per_unit]
+            unit = pi.find_input_value(ppath+"Unit")[:value] rescue nil
+            per_unit = pi.find_input_value(ppath+"PerUnit")[:value] rescue nil
             if (unit && !unit.blank?) || (per_unit && !per_unit.blank?)
               str += ";"
               str += unit if (unit && !unit.blank?)

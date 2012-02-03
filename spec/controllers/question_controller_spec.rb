@@ -27,4 +27,17 @@ describe QuestionController do
 
 
   end
+
+  describe "GET detail" do
+
+    it "gets results with a single input quantity" do
+      get :detailed_answer, :quantities => '100.0 km', :terms => 'truck', :category => 'Generic_van_transport'
+      assigns(:pi).should_not be_nil
+      assigns(:pi).total_amount.should eql 27.18
+      assigns(:more_info_url).should eql 'http://discover.amee.com/categories/Generic_van_transport/data/cng/up%20to%203.5%20tonnes/result/false/true/none/100.0;km/false/none/0/-1/0/true/false/false'
+    end
+    
+  end
+
+
 end
