@@ -14,10 +14,10 @@
 <% end %>
 $("#<%=id%>").slideDown();
 
-responsesLeft -= 1;
-
-if (responsesLeft > 0)
+if (categories.length > 0) {
 	$("#thinking").replaceWith("<%= escape_javascript(render :partial => 'thinking') %>");
+	loadDetail(categories.shift(), quantities, terms);
+}
 else if (gotResult == true)
 	$("#thinking").replaceWith("");
 else

@@ -22,6 +22,7 @@ group :development, :test do
   gem 'sqlite3'
   gem 'rspec-rails'
   gem 'pry'
+  gem 'heroku'
 end
 group :production do
   gem 'pg'

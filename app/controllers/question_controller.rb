@@ -29,7 +29,8 @@ class QuestionController < ApplicationController
                                       :q => thesaurus_expand(@terms.join(" ")), 
                                       :types=>'DC', 
                                       :matrix => 'itemDefinition;path', 
-                                      :excTags=>'ecoinvent,deprecated') { |y|
+                                      :excTags=>'ecoinvent,deprecated',
+                                      :resultMax => 30) { |y|
         y.result.meta.wikiname && y.result.itemdef.present? ? y.result.meta.wikiname : nil
       }.to_a
     end
@@ -38,6 +39,8 @@ class QuestionController < ApplicationController
     respond_to do |format|
       format.html {
         @message = thinking_message        
+        # Allow two detailed response requests at a time
+        @concurrency = 2
       }
       format.json
     end
@@ -82,10 +85,10 @@ class QuestionController < ApplicationController
         rescue AMEE::BadRequest => ex
           # Something went wrong; notify about the result but let the user carry on
           notify_airbrake(ex)
-          @category = nil
         end
       end
     end
+
     
     @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
     
