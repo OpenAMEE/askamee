@@ -53,10 +53,14 @@
 </div>
 <% if valid %>
   <script>
-    var responsesLeft = <%= @categories.size %>;
 	var gotResult = false;
-	<% @categories.each do |cat| %>
-      loadDetail('<%= cat %>', '<%= @quantities.map{|x| x.to_s}.join(',') %>', '<%= @terms.join(',') %>');
+	var terms = '<%= @terms.join(',') %>';
+	var quantities = '<%= @quantities.map{|x| x.to_s}.join(',') %>';
+	var categories = [
+	  <%= @categories.map{|x| "'#{x}'"}.join(',') %>
+	];
+	<% @concurrency.times do %>
+	  loadDetail(categories.shift(), quantities, terms);
     <% end %>
   </script>
   <%= render :partial => 'thinking'%>
