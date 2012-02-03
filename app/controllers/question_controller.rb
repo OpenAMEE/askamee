@@ -43,22 +43,14 @@ class QuestionController < ApplicationController
   end
 
   def detailed_answer
-    # Split URL paramters if present
-    if params[:quantities]
-      params[:quantities] = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten
-    end
-    params[:terms] = params[:terms].split(',') if params[:terms]
-    
     # Get parameters
-    @message = thinking_message
-    @terms = params[:terms]
-    @quantity = params[:quantities].first
-    
-    # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
-    return if @terms.nil? || @quantity.nil?
+    @terms = params[:terms].split(',')
+    @quantity = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten.first
+    @category_name = params[:category]    
 
-    @category_name = params[:category]
-        
+    # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
+    return if @terms.nil? || @quantity.nil? || @category_name.nil?
+
     # Get category, filter out bad ones
     @category = begin
       AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, @category_name, :matrix => 'itemDefinition;path')
@@ -100,7 +92,9 @@ class QuestionController < ApplicationController
     @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
     
     respond_to do |format|
-      format.js
+      format.js {
+        @message = thinking_message
+      }
       format.json
     end
   end
