@@ -85,10 +85,10 @@ class QuestionController < ApplicationController
         rescue AMEE::BadRequest => ex
           # Something went wrong; notify about the result but let the user carry on
           notify_airbrake(ex)
-          @category = nil
         end
       end
     end
+
     
     @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
     
