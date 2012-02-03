@@ -7,5 +7,8 @@
 	],
 	"quantities" : [ 
 		<%= @quantities.map{|x| "\"#{x.to_s}\"".html_safe}.join(",\n").html_safe %>
+	],
+	"subqueries" : [
+	<%= @categories.map{|x| "\"/detail.json?category=#{x}&terms=#{@terms.join(',')}&quantities=#{@quantities.map{|x| x.to_s}.join(',')}#{'&callback='+params[:callback] if params[:callback]}\"".html_safe}.join(",\n").html_safe %>
 	]
 }<%= ');' if params[:callback] -%>

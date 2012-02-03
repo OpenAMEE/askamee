@@ -44,6 +44,13 @@ describe QuestionController do
       assigns(:more_info_url).should eql 'http://discover.amee.com/categories/DEFRA_freight_transport_methodology/data/van/petrol/1.305-1.74%20t/result/100.0;km/1.0;t'
     end
 
+    it "gets results with IATA codes" do
+      get :detailed_answer, :quantities => 'from:LHR,to:LAX', :terms => 'fly', :category => 'Great_Circle_flight_methodology'
+      assigns(:amount).should_not be_nil
+      assigns(:amount)[:value].should be_within(1e-9).of(1064.49102031516)
+      assigns(:more_info_url).should eql 'http://discover.amee.com/categories/Great_Circle_flight_methodology/data/great%20circle%20route/result/LHR/LAX/false/1/-999/-999/-999/-999/none/average/1/1.9/false'
+    end
+
 
   end
 
