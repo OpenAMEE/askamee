@@ -1,0 +1,92 @@
+<div class='hero-unit'>
+	<h1>Ask AMEE JSON API</h1>
+</div>
+<p>
+	Ask AMEE provides an API on top of the standard <a href='http://www.amee.com/developer'>AMEEconnect API</a>, and adds natural language query capabilities to AMEE data.
+</p>
+<div class="alert-message error">
+	<p>
+		Note that this API is HIGHLY EXPERIMENTAL and can change at any time (although we will try to maintain backwards compatibility). Use at your own risk.
+	</p>
+</div>
+
+<h2>Requests</h2>
+<p>
+	First, do a GET request to the answer URL including your search query, but using a .json extension:
+</p>
+<pre>
+GET <a href='http://ask.amee.com/answer.json?q=10kg+of+beef'>http://ask.amee.com/answer.json?q=10kg+of+beef</a>
+</pre>
+<p>
+	You will get back something like this:
+</p>
+<pre>
+{
+	categories: [
+		"Cattle_and_swine_manure_methane_emissions",
+		"Poultry_manure_methane_emissions",
+		"Other_manure_methane_emissions",
+		"CLM_food_processing_emissions",
+		"CLM_food_lifecycle_emissions",
+		"All_airports_by_country"
+	],
+	terms: [
+		"beef"
+	],
+	quantities: [
+		"10.0 kg"
+	],
+	subqueries: [
+		"/detail.json?category=Cattle_and_swine_manure_methane_emissions&terms=beef&quantities=10.0 kg",
+		"/detail.json?category=Poultry_manure_methane_emissions&terms=beef&quantities=10.0 kg",
+		"/detail.json?category=Other_manure_methane_emissions&terms=beef&quantities=10.0 kg",
+		"/detail.json?category=CLM_food_processing_emissions&terms=beef&quantities=10.0 kg",
+		"/detail.json?category=CLM_food_lifecycle_emissions&terms=beef&quantities=10.0 kg",
+		"/detail.json?category=All_airports_by_country&terms=beef&quantities=10.0 kg"
+	]
+}
+</pre>
+<p>
+	The terms and quantities have been parsed from your query string, and the categories list shows matching categories
+	in AMEE. The subqueries array shows the subsequent requests you need to make to get the results for each one.
+</p>
+<p>
+	Do each subquery in turn, with a GET:
+</p>
+<pre>
+GET <a href='http://ask.amee.com/detail.json?category=CLM_food_processing_emissions&terms=beef&quantities=10.0 kg'>http://ask.amee.com/detail.json?category=CLM_food_processing_emissions&terms=beef&quantities=10.0 kg</a>
+</pre>
+<p>
+	If the category could produce an answer from the input data, you will get a result something like this:
+</p>
+<pre>
+{
+	answer: 6.38,
+	unit: "kg",
+	type: "CO2",
+	item: "canning, beef and pork",
+	more_info: "http://discover.amee.com/categories/CLM_food_processing_emissions/data/canning/beef%20and%20pork/result/10.0;kg",
+	item_uid: "D67502911A81",
+	inputs: {
+		Mass of product processed: "10.0 kg"
+	}
+}
+</pre>
+<p>
+	If there weren't enough inputs (or the wrong kind) to produce an answer, you will get null values. This is intentional - it allows you
+	to give people links to explore deeper or add more information through <a href='http://discover.amee.com'>AMEEdiscover</a>.
+</p>
+<pre>
+GET <a href='http://ask.amee.com/detail.json?category=Cattle_and_swine_manure_methane_emissions&terms=beef&quantities=10.0 kg'>http://ask.amee.com/detail.json?category=Cattle_and_swine_manure_methane_emissions&terms=beef&quantities=10.0 kg</a>
+</pre>
+<pre>
+{
+	answer: null,
+	unit: null,
+	type: null,
+	item: null,
+	more_info: "http://discover.amee.com/categories/Cattle_and_swine_manure_methane_emissions/data/Breeding%20swine/Eastern%20Europe/10/calculator",
+	item_uid: null,
+	inputs: { }
+}
+</pre>
