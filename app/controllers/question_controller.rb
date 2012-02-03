@@ -47,8 +47,8 @@ class QuestionController < ApplicationController
   def detailed_answer
     # Get parameters
     @terms = params[:terms].split(',') rescue []
-    @quantities = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten rescue []
-    @category_name = params[:category]    
+    @quantities = params[:quantities].split(',').map{|x| Quantity.parse(x, :remainder => true)}.flatten.select{|x| !x.blank?}
+    @category_name = params[:category]
 
     # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
     return if @terms.empty? || @quantities.empty? || @category_name.nil?
@@ -122,9 +122,15 @@ class QuestionController < ApplicationController
     # Assign each quantity to a matching profile IVD
     inputs = {}
     quantities.each do |quantity|
-      # Find an ivd with the right dimensionality
-      ivd = ivds.find{|x| (quantity.unit.label == x.unit.to_s) || quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
-      inputs[ivd] = quantity if ivd
+      if quantity.is_a?(Quantity)
+        # Find an ivd with the right dimensionality
+        ivd = ivds.find{|x| (quantity.unit.label == x.unit.to_s) || quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
+        inputs[ivd] = quantity if ivd
+      elsif quantity.start_with?("from:")
+        inputs.merge! match_journey_start(category, ivds, quantity)
+      elsif quantity.start_with?("to:")
+        inputs.merge! match_journey_end(category, ivds, quantity)
+      end
     end
     # Done
     inputs
@@ -133,13 +139,39 @@ class QuestionController < ApplicationController
   def create_amee_params(inputs)
     amee_params = {}
     inputs.each_pair do |ivd, quantity|
-      # Create input parameters for value...
-      amee_params[:"#{ivd.path}"] = quantity.value
-      # ... and unit, if appropriate
-      amee_params[:"#{ivd.path}Unit"] = quantity.unit.label unless quantity.unit.label.blank?
+      if quantity.is_a?(Quantity)
+        # Create input parameters for value...
+        amee_params[:"#{ivd.path}"] = quantity.value
+        # ... and unit, if appropriate
+        amee_params[:"#{ivd.path}Unit"] = quantity.unit.label unless quantity.unit.label.blank?
+      else
+        # Create input parameter for the string
+        amee_params[:"#{ivd.path}"] = quantity
+      end
     end
     amee_params
   end
 
+  # This is a bit of a cheat - we hardcode categories that we know can represent start/end points
+  def match_journey_start(category, ivds, quantity)
+    case category.meta.wikiname
+    when "Great_Circle_flight_methodology", "Specific_jet_aircraft", "Specific_turboprop_aircraft"
+      {ivds.find{|x| x.path == 'IATACode1'} => quantity.split(':')[1]}
+    when "Train_Route"
+      {ivds.find{|x| x.path == 'station1'} => quantity.split(':')[1]}
+    else
+      {}
+    end
+  end
+  def match_journey_end(category, ivds, quantity)
+    case category.meta.wikiname
+    when "Great_Circle_flight_methodology", "Specific_jet_aircraft", "Specific_turboprop_aircraft"
+      {ivds.find{|x| x.path == 'IATACode2'} => quantity.split(':')[1]}
+    when "Train_Route"
+      {ivds.find{|x| x.path == 'station2'} => quantity.split(':')[1]}      
+    else
+      {}
+    end
+  end
 
 end

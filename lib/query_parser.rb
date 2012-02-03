@@ -29,15 +29,18 @@ module QueryParser
       "an"
     ]
     terms.delete_if {|x| ignore.include? x }
-    # Add dimensionless quantities if they are in the NOT_NUMBERS list
-    # This allows terms like '747'
-    terms.concat quantities.select{|x| x.is_a?(Quantity) && x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.map{|x| x.value.to_i.to_s}
+    # Move dimensionless quantities from quantities to terms if they are in the NOT_NUMBERS list
+    # This allows terms like '747'. Unfortunately it means you can't calculate '747 cows'.
+    quantities.select{|x| x.is_a?(Quantity) && x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.each do |quantity|
+      terms << quantity.value.to_i.to_s
+      quantities.delete quantity
+    end
     # All done, carry on.
     return quantities, terms
   end
 
   def extract_journey(terms)
-    match = terms.join(' ').match(/^(.*) from (.*) to (.*)$/i)
+    match = terms.join(' ').match(/^(.*) from ([A-Z]{3}) to ([A-Z]{3})/i)
     if match
       journeys = ["from:#{match[2]}", "to:#{match[3]}"]
       terms = match[1].split(' ')
