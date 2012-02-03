@@ -3,6 +3,7 @@
 	"unit" : <%= (@pi ? "\"#{@amount[:unit]}\"".html_safe : 'null') %>, 
 	"type" : <%= (@pi ? "\"#{@amount[:type]}\"".html_safe : 'null') %>, 
 	"item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, 
+	"more_info" : "<%= @more_info_url %>", 
 	"item_uid" : <%= (@pi ? ('"'+@item.uid+'"').html_safe : 'null') %>, 
 	"inputs" : <%= (@pi ? ('{"'+@ivd.name+'":"'+@quantity.to_s+'"}').html_safe : 'null') %>
 }<%= ');' if params[:callback] -%>

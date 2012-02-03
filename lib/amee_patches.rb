@@ -15,6 +15,14 @@ module AMEE
       end
 
     end
+    
+    class Item
+      
+      def find_value(path)
+        values.find{ |x| x[:path] == path}
+      end
+      
+    end
 
   end
 

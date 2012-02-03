@@ -1,10 +1,12 @@
 require 'query_parser'
 require 'thesaurus'
+require 'discover'
 
 class QuestionController < ApplicationController
 
   include QueryParser
   include Thesaurus
+  include AMEE::Discover
 
   def new
   end
@@ -90,6 +92,8 @@ class QuestionController < ApplicationController
     end
     
     @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
+    
+    @more_info_url = discover_url(@category, @item, @pi)
     
     respond_to do |format|
       format.js {
