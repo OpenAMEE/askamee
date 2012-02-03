@@ -5,5 +5,9 @@
 	"item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, 
 	"more_info" : "<%= @more_info_url %>", 
 	"item_uid" : <%= (@pi ? ('"'+@item.uid+'"').html_safe : 'null') %>, 
-	"inputs" : <%= (@pi ? ('{"'+@ivd.name+'":"'+@quantity.to_s+'"}').html_safe : 'null') %>
+	"inputs" : {
+		<%= @inputs.map { |input|
+		  '"'+input[0].name+'":"'+input[1].to_s+'"'
+		}.join(',').html_safe %>
+	}
 }<%= ');' if params[:callback] -%>

@@ -32,11 +32,19 @@ describe QuestionController do
 
     it "gets results with a single input quantity" do
       get :detailed_answer, :quantities => '100.0 km', :terms => 'truck', :category => 'Generic_van_transport'
-      assigns(:pi).should_not be_nil
-      assigns(:pi).total_amount.should eql 27.18
+      assigns(:amount).should_not be_nil
+      assigns(:amount)[:value].should eql 27.18
       assigns(:more_info_url).should eql 'http://discover.amee.com/categories/Generic_van_transport/data/cng/up%20to%203.5%20tonnes/result/false/true/none/100.0;km/false/none/0/-1/0/true/false/false'
     end
     
+    it "gets results with two input quantities" do
+      get :detailed_answer, :quantities => '100.0 km,1.0 t', :terms => 'truck', :category => 'DEFRA_freight_transport_methodology'
+      assigns(:amount).should_not be_nil
+      assigns(:amount)[:value].should eql 80.7365279
+      assigns(:more_info_url).should eql 'http://discover.amee.com/categories/DEFRA_freight_transport_methodology/data/van/petrol/1.305-1.74%20t/result/100.0;km/1.0;t'
+    end
+
+
   end
 
 

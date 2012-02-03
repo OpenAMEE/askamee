@@ -46,12 +46,12 @@ class QuestionController < ApplicationController
 
   def detailed_answer
     # Get parameters
-    @terms = params[:terms].split(',')
-    @quantity = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten.first
+    @terms = params[:terms].split(',') rescue []
+    @quantities = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten rescue []
     @category_name = params[:category]    
 
     # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
-    return if @terms.nil? || @quantity.nil? || @category_name.nil?
+    return if @terms.empty? || @quantities.empty? || @category_name.nil?
 
     # Get category, filter out bad ones
     @category = begin
@@ -61,13 +61,6 @@ class QuestionController < ApplicationController
       nil
     end
 
-    # Check IVD check that inputs are compatible with the units you've asked for
-    if @category
-      ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
-      ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
-      @ivd = ivds.find{|x| (@quantity.unit.label == x.unit.to_s) || @quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
-    end
-
     # Search for a data item
     if @category
       @item = AMEE::Search::WithinCategory.new( AMEE::Rails.connection, :label => thesaurus_expand(@terms.join(" ")), :wikiname=>@category.meta.wikiname, :resultMax => 1, :matrix => 'label').try(:first).try(:result)
@@ -75,19 +68,21 @@ class QuestionController < ApplicationController
     end
 
     # Do the calculation
-    if @category && @item && @ivd
-      begin
-        opts = {
-          @ivd.path.to_sym => @quantity.value
-        }
-        opts[:"#{@ivd.path}Unit"] = @quantity.unit.label unless @quantity.unit.label.blank?
-        @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
-                                   "/data#{@category.path}/#{@item.uid}",
-                                   opts)
-      rescue AMEE::BadRequest => ex
-        # Something went wrong; notify about the result but let the user carry on
-        notify_airbrake(ex)
-        @category = nil
+    if @category && @item
+      # Assign quantities to input parameters
+      @inputs = assign_inputs(@category, @quantities)
+      # As long as we have the right matching inputs...
+      if @inputs.size == @quantities.size
+        begin
+          # Do the calculation
+          @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
+                                     "/data#{@category.path}/#{@item.uid}",
+                                     create_amee_params(@inputs))
+        rescue AMEE::BadRequest => ex
+          # Something went wrong; notify about the result but let the user carry on
+          notify_airbrake(ex)
+          @category = nil
+        end
       end
     end
     
@@ -119,4 +114,31 @@ class QuestionController < ApplicationController
     ].shuffle.first
   end
   
+  def assign_inputs(category, quantities)
+    # get v2 profile ivds
+    ivds = category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
+    ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
+    # Assign each quantity to a matching profile IVD
+    inputs = {}
+    quantities.each do |quantity|
+      # Find an ivd with the right dimensionality
+      ivd = ivds.find{|x| (quantity.unit.label == x.unit.to_s) || quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
+      inputs[ivd] = quantity if ivd
+    end
+    # Done
+    inputs
+  end
+
+  def create_amee_params(inputs)
+    amee_params = {}
+    inputs.each_pair do |ivd, quantity|
+      # Create input parameters for value...
+      amee_params[:"#{ivd.path}"] = quantity.value
+      # ... and unit, if appropriate
+      amee_params[:"#{ivd.path}Unit"] = quantity.unit.label unless quantity.unit.label.blank?
+    end
+    amee_params
+  end
+
+
 end
