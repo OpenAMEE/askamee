@@ -78,6 +78,7 @@ class QuestionController < ApplicationController
           @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
                                      "/data#{@category.path}/#{@item.uid}",
                                      create_amee_params(@inputs))
+          @pi = nil if @pi.amounts.empty?
         rescue AMEE::BadRequest => ex
           # Something went wrong; notify about the result but let the user carry on
           notify_airbrake(ex)
