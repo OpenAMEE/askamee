@@ -1,5 +1,5 @@
 <%= params[:callback]+'(' if params[:callback] -%>{
-	"answer" : <%= (@pi ? number_with_precision(@amount[:value], :precision => 2, :delimiter => ',') : 'null') %>, 
+	"answer" : <%= (@pi ? number_with_precision(@amount[:value], :precision => 2) : 'null') %>, 
 	"unit" : <%= (@pi ? "\"#{@amount[:unit]}\"".html_safe : 'null') %>, 
 	"type" : <%= (@pi ? "\"#{@amount[:type]}\"".html_safe : 'null') %>, 
 	"item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, 
