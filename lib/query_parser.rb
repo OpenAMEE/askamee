@@ -25,7 +25,8 @@ module QueryParser
       "a",
       "in",
       "for",
-      "on"
+      "on",
+      "an"
     ]
     terms.delete_if {|x| ignore.include? x }
     # Add dimensionless quantities if they are in the NOT_NUMBERS list
