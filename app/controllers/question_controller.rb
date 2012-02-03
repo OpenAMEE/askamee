@@ -1,103 +1,64 @@
+require 'query_parser'
+require 'thesaurus'
+require 'discover'
+
 class QuestionController < ApplicationController
+
+  include QueryParser
+  include Thesaurus
+  include AMEE::Discover
 
   def new
   end
 
   def answer
-    # Reset the session data
-    session[:quantity] = nil
-    session[:terms] = nil
-    session[:categories] = nil
+    
     # Save this search in the database
     search = Search.find_by_string(params[:q]) || Search.new(:string => params[:q])
     search.count += 1
     search.save!
-    # Get the query parameters out
-    query = params[:q].split
-    @quantities, @terms = Quantity.parse(params[:q], :remainder => true)
-    @quantity = @quantities.first
-    @quantity = nil if @quantity.unit.nil?
-    # Then run term extraction for interesting words
-    # We might have separate strings between quantities, so join them all and re-split on space
-    @terms = @terms.join(' ').split(' ')
-    ignore = [
-      "emissions",
-      "impact",
-      "and",
-      "of",
-      "the",
-      "a",
-      "in"
-    ]
-    @terms.delete_if {|x| ignore.include? x }
-    @terms.concat @quantities.select{|x| x.unit == Unit.dimensionless && NOT_NUMBERS.include?(x.value.to_i.to_s)}.map{|x| x.value.to_i.to_s}
+    
+    # Parse query
+    @quantities, @terms = parse_query(params[:q])
+
     # Find some AMEE categories that look relevant
-    # Create new search for cat results
     # AMEE::Search has an implicit map here, so we get back a list of wikinames
     @categories = []
-    unless @quantity.nil? || @terms.empty?
-      @categories = AMEE::Search.new( AMEE::Rails.connection, :q => thesaurus_expand(@terms.join(" ")), :types=>'DC', :matrix => 'itemDefinition;path', :excTags=>'ecoinvent', :resultMax => 30 ) do |y|
-        y.result.meta.wikiname
-      end
-      # Everything is stored in the session under a unique ID, as we'll need to come back to it later.
-      # The unique ID is used to avoid clashes when multiple queries happen in the same session
-      @query_id = UUIDTools::UUID.timestamp_create
-      session.clear
-      session[:quantities] = @quantities = [@quantity]
-      session[:terms] = @terms
-      session[:categories] = @categories = @categories.to_a
-      @message = thinking_message
-      respond_to do |format|
-        format.html
-        format.json
-      end
+    unless @quantities.empty? || @terms.empty?
+      @categories = AMEE::Search.new( AMEE::Rails.connection, 
+                                      :q => thesaurus_expand(@terms.join(" ")), 
+                                      :types=>'DC', 
+                                      :matrix => 'itemDefinition;path', 
+                                      :excTags=>'ecoinvent,deprecated') { |y|
+        y.result.meta.wikiname && y.result.itemdef.present? ? y.result.meta.wikiname : nil
+      }.to_a
     end
-  rescue NoMethodError => ex
-    # Incuded to catch quantify parse errors
-    @categories = @terms = @quantities = []
-    nil
+    
+    # Render
+    respond_to do |format|
+      format.html {
+        @message = thinking_message        
+      }
+      format.json
+    end
+    
   end
 
   def detailed_answer
-    # Split URL paramters if present
-    if params[:quantities]
-      params[:quantities] = params[:quantities].split(',').map{|x| Quantity.parse(x)}.flatten
-    end
-    params[:terms] = params[:terms].split(',') if params[:terms]
-    
     # Get parameters
-    @message = thinking_message
-    @terms = params[:terms] || session[:terms]
-    @quantity = (params[:quantities] ? params[:quantities].first : session[:quantities].first)
-    
-    # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
-    return if @terms.nil? || @quantity.nil?
-
+    @terms = params[:terms].split(',') rescue []
+    @quantities = params[:quantities].split(',').map{|x| Quantity.parse(x, :remainder => true)}.flatten.select{|x| !x.blank?}
     @category_name = params[:category]
-    if @category_name.nil?
-      return if session[:categories].nil? || session[:categories].empty?
-      @category_name = session[:categories].delete_at(0)
-    end
-        
+
+    # Check inputs are valid. Skip if not. We shouldn't really get here, but be defensive just in case.
+    return if @terms.empty? || @quantities.empty? || @category_name.nil?
+
     # Get category, filter out bad ones
     @category = begin
       AMEE::Data::Category.find_by_wikiname(AMEE::Rails.connection, @category_name, :matrix => 'itemDefinition;path')
     rescue AMEE::PermissionDenied
       @private = true if params[:private] == true
       nil
-    end
-
-    @category = nil if (@category.nil? ||
-                        @category.meta.wikiname.blank? || 
-                        @category.meta.deprecated?|| 
-                        @category.item_definition.nil? || 
-                        @category.meta.tags.include?("deprecated"))
-
-    # Check IVD check that inputs are compatible with the units you've asked for
-    if @category
-      ivds = @category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
-      ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
-      @ivd = ivds.find{|x| (@quantity.unit.label == x.unit.to_s) || @quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
     end
 
     # Search for a data item
@@ -107,27 +68,33 @@ class QuestionController < ApplicationController
     end
 
     # Do the calculation
-    if @category && @item && @ivd
-      begin
-        opts = {
-          @ivd.path.to_sym => @quantity.value
-        }
-        opts[:"#{@ivd.path}Unit"] = @quantity.unit.label unless @quantity.unit.label.blank?
-        @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
-                                   "/data#{@category.path}/#{@item.uid}",
-                                   opts)
-        session[:got_result] = true
-      rescue AMEE::BadRequest => ex
-        # Something went wrong; notify about the result but let the user carry on
-        notify_airbrake(ex)
-        @category = nil
+    if @category && @item
+      # Assign quantities to input parameters
+      @inputs = assign_inputs(@category, @quantities)
+      # As long as we have the right matching inputs...
+      if @inputs.size == @quantities.size
+        begin
+          # Do the calculation
+          @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
+                                     "/data#{@category.path}/#{@item.uid}",
+                                     create_amee_params(@inputs))
+          @pi = nil if @pi.amounts.empty?
+        rescue AMEE::BadRequest => ex
+          # Something went wrong; notify about the result but let the user carry on
+          notify_airbrake(ex)
+          @category = nil
+        end
       end
     end
     
     @amount = @pi.amounts.find{|x| x[:default] == true} if @pi
     
+    @more_info_url = discover_url(@category, @item, @pi)
+    
     respond_to do |format|
-      format.js
+      format.js {
+        @message = thinking_message
+      }
       format.json
     end
   end
@@ -148,41 +115,63 @@ class QuestionController < ApplicationController
     ].shuffle.first
   end
   
-  def thesaurus_expand(query,inflect=true)
-    terms=CSV::parse_line(query,' ') # so that quoted strings aren't tokenized
-    finalterms=[]
-    terms.each do |term|
-      next unless term
-      logicsymbol=term.slice(0,1)
-      if (logicsymbol=~/[\+\-]/)
-        lterm=term.slice(1,term.length)
-      else
-        lterm=term.to_s
-        logicsymbol=nil
+  def assign_inputs(category, quantities)
+    # get v2 profile ivds
+    ivds = category.item_definition.item_value_definition_list.sort{|a,b| a.path<=>b.path}
+    ivds = ivds.select{|x| x.profile? && x.versions.any?{|y| y=~/2/}}
+    # Assign each quantity to a matching profile IVD
+    inputs = {}
+    quantities.each do |quantity|
+      if quantity.is_a?(Quantity)
+        # Find an ivd with the right dimensionality
+        ivd = ivds.find{|x| (quantity.unit.label == x.unit.to_s) || quantity.unit.alternatives_by_label.include?(x.unit.to_s) }
+        inputs[ivd] = quantity if ivd
+      elsif quantity.start_with?("from:")
+        inputs.merge! match_journey_start(category, ivds, quantity)
+      elsif quantity.start_with?("to:")
+        inputs.merge! match_journey_end(category, ivds, quantity)
       end
-      expanded=[lterm]
-      THESAURUS.each do |synonym_list|
-        # assume synonym lists disjoint.
-        # otherwise will end up with the original term multiple times
-        if synonym_list.include?(lterm)
-          expanded.concat synonym_list-[lterm]
-        end
-      end
-      aexpanded=expanded.clone
-      aexpanded.each do |e|
-        expanded<<e.pluralize unless e.pluralize==e if inflect
-        expanded<<e.singularize unless e.singularize==e if inflect
-      end
-      finalterms.push(restorelogic(logicsymbol,expanded))
     end
-    finalterms.join(' ')
+    # Done
+    inputs
   end
-  
-  def restorelogic(operator,terms)
-      return terms.join(" ") if operator==nil
-      return "+(#{terms.join(" ")})" if operator=="+"&&terms.length>1
-      return "+#{terms.first}" if operator=="+"
-      return "-#{terms.join(" -")}" if operator=="-"
+
+  def create_amee_params(inputs)
+    amee_params = {}
+    inputs.each_pair do |ivd, quantity|
+      if quantity.is_a?(Quantity)
+        # Create input parameters for value...
+        amee_params[:"#{ivd.path}"] = quantity.value
+        # ... and unit, if appropriate
+        amee_params[:"#{ivd.path}Unit"] = quantity.unit.label unless quantity.unit.label.blank?
+      else
+        # Create input parameter for the string
+        amee_params[:"#{ivd.path}"] = quantity
+      end
+    end
+    amee_params
+  end
+
+  # This is a bit of a cheat - we hardcode categories that we know can represent start/end points
+  def match_journey_start(category, ivds, quantity)
+    case category.meta.wikiname
+    when "Great_Circle_flight_methodology", "Specific_jet_aircraft", "Specific_turboprop_aircraft"
+      {ivds.find{|x| x.path == 'IATACode1'} => quantity.split(':')[1]}
+    when "Train_Route"
+      {ivds.find{|x| x.path == 'station1'} => quantity.split(':')[1]}
+    else
+      {}
+    end
+  end
+  def match_journey_end(category, ivds, quantity)
+    case category.meta.wikiname
+    when "Great_Circle_flight_methodology", "Specific_jet_aircraft", "Specific_turboprop_aircraft"
+      {ivds.find{|x| x.path == 'IATACode2'} => quantity.split(':')[1]}
+    when "Train_Route"
+      {ivds.find{|x| x.path == 'station2'} => quantity.split(':')[1]}      
+    else
+      {}
+    end
   end
 
 end

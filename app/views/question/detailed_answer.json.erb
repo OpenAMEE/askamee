@@ -1,8 +1,13 @@
 <%= params[:callback]+'(' if params[:callback] -%>{
-	"answer" : <%= (@pi ? number_with_precision(@amount[:value], :precision => 2, :delimiter => ',') : 'null') %>, 
+	"answer" : <%= (@pi ? number_with_precision(@amount[:value], :precision => 2) : 'null') %>, 
 	"unit" : <%= (@pi ? "\"#{@amount[:unit]}\"".html_safe : 'null') %>, 
 	"type" : <%= (@pi ? "\"#{@amount[:type]}\"".html_safe : 'null') %>, 
 	"item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, 
+	"more_info" : "<%= @more_info_url %>", 
 	"item_uid" : <%= (@pi ? ('"'+@item.uid+'"').html_safe : 'null') %>, 
-	"inputs" : <%= (@pi ? ('{"'+@ivd.name+'":"'+@quantity.to_s+'"}').html_safe : 'null') %>
+	"inputs" : {
+		<%= @inputs.map { |input|
+		  '"'+input[0].name+'":"'+input[1].to_s+'"'
+		}.join(',').html_safe %>
+	}
 }<%= ');' if params[:callback] -%>

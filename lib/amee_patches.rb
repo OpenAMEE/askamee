@@ -15,6 +15,14 @@ module AMEE
       end
 
     end
+    
+    class Item
+      
+      def find_input_value(path)
+        choices.find{ |x| x[:name] == path}
+      end
+      
+    end
 
   end
 

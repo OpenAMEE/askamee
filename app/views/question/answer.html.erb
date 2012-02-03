@@ -1,12 +1,22 @@
-<% valid = session[:categories] && session[:categories].size > 0 && session[:quantities] && session[:quantities].size > 0 && @terms %>
-<div class='hero-unit'>
+<% valid = !@categories.empty? && !@quantities.empty? && !@terms.empty? %>
+<div class='hero-unit' style='padding-bottom: 10px;'>
   <%= render :partial => 'ask'%>
+  <!-- AddThis Button BEGIN -->
+  <div class="addthis_toolbox addthis_default_style addthis_32x32_style" style='margin-top:50px; width:200px; margin-left: auto; margin-right: auto'>
+  <a class="addthis_button_preferred_1"></a>
+  <a class="addthis_button_preferred_2"></a>
+  <a class="addthis_button_preferred_3"></a>
+  <a class="addthis_button_preferred_4"></a>
+  <a class="addthis_button_compact"></a>
+  </div>
+  <script type="text/javascript" src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=xa-4f2bac3f00668293"></script>
+  <!-- AddThis Button END -->
 </div>
 <% if valid %>
   <div class='alert-message info'>
     OK, I'm going to look for things related to 
     <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
-    that have <%= [@quantity].map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
+    that have <%= @quantities.map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
     as inputs.
   </div>
 <% end %>
@@ -27,7 +37,7 @@
 		    <h3>
 		      Couldn't match input units
 		    </h3>
-			These categories look relevant, but don't have any inputs of the right type:
+			These categories look relevant, but don't have the right type of inputs:
 			<ul id="wrong_dimension_list">
 			</ul>
 		</div>		
@@ -42,6 +52,13 @@
 	</div>
 </div>
 <% if valid %>
+  <script>
+    var responsesLeft = <%= @categories.size %>;
+	var gotResult = false;
+	<% @categories.each do |cat| %>
+      loadDetail('<%= cat %>', '<%= @quantities.map{|x| x.to_s}.join(',') %>', '<%= @terms.join(',') %>');
+    <% end %>
+  </script>
   <%= render :partial => 'thinking'%>
 <% else %>
   <%= render :partial => 'no_results'%>

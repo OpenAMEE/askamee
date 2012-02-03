@@ -1,4 +1,5 @@
 Askamee::Application.routes.draw do
+
   mount RailsAdmin::Engine => '/admin', :as => 'rails_admin'
 
   get "question/new"
@@ -6,4 +7,8 @@ Askamee::Application.routes.draw do
   match "/answer" => "question#answer"
   # AJAX route for detailed answer chunks
   match '/detail' => 'question#detailed_answer'
+
+  # Static API docs
+  get "/api" => "static#api"
+
 end

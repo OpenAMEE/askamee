@@ -12,7 +12,10 @@
   <div class="span9">
     <blockquote> 
       <p>
-        based on '<%= @ivd.name.downcase %>' being <%= @quantity %>
+        based on 
+		<%= @inputs.map { |input|
+		  "'#{input[0].name.downcase}' being #{input[1].to_s}"
+		}.join(', and ') %>
       </p>
       <p>
         using the item '<%= @item.label %>' 
@@ -25,7 +28,7 @@
   </div>
   <div class="span2">
     <%= link_to "More info", 
-                discover_url(@category),
+                @more_info_url,
                 :class => 'btn primary' %>
   </div>
 </div>

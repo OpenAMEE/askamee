@@ -1,6 +1,11 @@
-@loadDetail = ->
+@loadDetail = (category, quantities, terms) ->
   jQuery.ajax({
-          dataType: 'script',
-          type:     'post',
-          url:      "/detail"
-        });
+          dataType: 'script',
+          type:     'get',
+          url:      "/detail",
+		  data:     {
+			  			'category': category,
+			  			'quantities': quantities,
+						'terms': terms
+		  			}
+        });
