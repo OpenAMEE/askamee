@@ -29,7 +29,7 @@ Askamee::Application.configure do
   config.assets.debug = true
 
   # Allow caching
-  config.action_controller.perform_caching = true
+  config.action_controller.perform_caching = false
   config.cache_store = :memory_store
 
 end

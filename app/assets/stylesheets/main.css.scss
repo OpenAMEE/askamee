@@ -4,14 +4,10 @@ footer img {
 	float: right;
 }
 
-body {
-	margin-top: 40px;
-}
-
 $topbarstart: rgb(127,189,200);
 $topbarend: rgb(166,205,212);
 
-.topbar-inner, .topbar .fill {
+.navbar-inner, .navbar .fill {
   background-color: $topbarend;
   background-image: -khtml-gradient(linear, left top, left bottom, from($topbarstart), to($topbarend));
   background-image: -moz-linear-gradient(top, $topbarstart, $topbarend);
@@ -26,8 +22,13 @@ $topbarend: rgb(166,205,212);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 }
 
-div.topbar p, div.topbar p a {
+div.navbar p, div.navbar p a {
+  padding-top: 12px;
   color: white;
+}
+
+div.navbar {
+  margin-bottom: 2px;
 }
 
 div#ask {
@@ -43,21 +44,35 @@ div#ask input[type=text] {
   width: 500px;
 }
 
-div.alert-message.block-message.info {
+div#ask input.btn {
+  line-height: normal;
+}
+
+div.alert.alert-block.alert-info {
   background-color: #f8f8f8;
   border: 1px solid whiteSmoke;
   color: #aaa;
 }
 
-div.alert-message.block-message.info h3, div.alert-message.block-message.info a {
+div.alert.alert-block.alert-info h3, div.alert.alert-block.alert-info a {
   color: #aaa;
 }
 
-div.alert-message.block-message.info h3, div.alert-message.block-message.info li {
+div.alert.alert-block.alert-info h3, div.alert.alert-block.alert-info li {
   list-style-type: none;
   margin-bottom: 3px;
 }
 
-div.alert-message.block-message.info ul {
+div.alert.alert-block.alert-info ul {
   margin-top: 10px;
+}
+
+footer {
+  margin-top: 17px;
+  padding-top: 17px;
+  border-top: 1px solid #EEE;
+}
+
+div.more-info-btn {
+  text-align: right;
 }

@@ -13,7 +13,7 @@
   <!-- AddThis Button END -->
 </div>
 <% if valid %>
-  <div class='alert-message info'>
+  <div class='alert alert-info'>
     OK, I'm going to look for things related to 
     <%= @terms.map{|x| "<strong>#{h(x)}</strong>"}.join(' and ').html_safe %>
     that have <%= @quantities.map{|x| "<strong>#{x.to_s}</strong>"}.join(' and ').html_safe %>
@@ -21,11 +21,11 @@
   </div>
 <% end %>
 <div class='row'>
-	<div class="container span11" id="answerlist">
+	<div class="span8" id="answerlist">
 		<div style='height: 1px'>&nbsp;</div>
 	</div>
-	<div class="container span5">
-		<div class='alert-message block-message info' style='display:none' id='more_info_container'>
+	<div class="span4">
+		<div class='alert alert-block alert-info' style='display:none' id='more_info_container'>
 		    <h3>
 		      More information needed
 		    </h3>
@@ -33,7 +33,7 @@
 			<ul id="more_info_list">
 			</ul>
 		</div>
-		<div class='alert-message block-message info' style='display:none' id='wrong_dimension_container'>
+		<div class='alert alert-block alert-info' style='display:none' id='wrong_dimension_container'>
 		    <h3>
 		      Couldn't match input units
 		    </h3>
@@ -41,7 +41,7 @@
 			<ul id="wrong_dimension_list">
 			</ul>
 		</div>		
-		<div class='alert-message block-message info' style='display:none' id='private_container'>
+		<div class='alert alert-block alert-info' style='display:none' id='private_container'>
 		    <h3>
 		      Premium datasets
 		    </h3>
