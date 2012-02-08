@@ -64,27 +64,26 @@ class QuestionController < ApplicationController
       nil
     end
 
-    # Search for a data item
-    if @category
-      @item = AMEE::Search::WithinCategory.new( AMEE::Rails.connection, :label => thesaurus_expand(@terms.join(" ")), :wikiname=>@category.meta.wikiname, :resultMax => 1, :matrix => 'label').try(:first).try(:result)
-      @item = @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } if @item.nil?
-    end
-
     # Do the calculation
-    if @category && @item
+    if @category
       # Assign quantities to input parameters
       @inputs = assign_inputs(@category, @quantities)
       # As long as we have the right matching inputs...
       if @inputs.size == @quantities.size
-        begin
-          # Do the calculation
-          @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
-                                     "/data#{@category.path}/#{@item.uid}",
-                                     create_amee_params(@inputs))
-          @pi = nil if @pi.amounts.empty?
-        rescue AMEE::BadRequest => ex
-          # Something went wrong; notify about the result but let the user carry on
-          notify_airbrake(ex)
+        # Search for a data item
+        @item = AMEE::Search::WithinCategory.new( AMEE::Rails.connection, :label => thesaurus_expand(@terms.join(" ")), :wikiname=>@category.meta.wikiname, :resultMax => 1, :matrix => 'label').try(:first).try(:result)
+        @item = @category.data_items(:resultMax => 10, :matrix => 'label').find{|x| x.label != x.uid } if @item.nil?
+        if @item
+          begin
+            # Do the calculation
+            @pi = AMEE::Data::Item.get(AMEE::Rails.connection,
+                                       "/data#{@category.path}/#{@item.uid}",
+                                       create_amee_params(@inputs))
+            @pi = nil if @pi.amounts.empty?
+          rescue AMEE::BadRequest => ex
+            # Something went wrong; notify about the result but let the user carry on
+            notify_airbrake(ex)
+          end
         end
       end
     end
