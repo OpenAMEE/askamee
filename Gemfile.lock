@@ -86,6 +86,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.2.0)
+    dalli (1.1.4)
     devise (1.5.3)
       bcrypt-ruby (~> 3.0)
       orm_adapter (~> 0.0.3)
@@ -222,6 +223,7 @@ DEPENDENCIES
   amee-internal (~> 5.0)
   bootstrap-sass
   coffee-rails (~> 3.1.1)
+  dalli
   devise
   fastercsv
   heroku

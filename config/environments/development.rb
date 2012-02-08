@@ -27,4 +27,9 @@ Askamee::Application.configure do
 
   # Expands the lines which load the assets
   config.assets.debug = true
+
+  # Allow caching
+  config.action_controller.perform_caching = true
+  config.cache_store = :memory_store
+
 end

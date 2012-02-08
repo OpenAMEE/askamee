@@ -8,6 +8,10 @@ class QuestionController < ApplicationController
   include Thesaurus
   include AMEE::Discover
 
+  caches_action :new
+  caches_action :answer, :cache_path => Proc.new {|c| c.request.url }
+  caches_action :detailed_answer, :cache_path => Proc.new {|c| c.request.url }
+
   def new
   end
 
