@@ -10,6 +10,7 @@ gem 'bootstrap-sass'
 gem 'fastercsv'
 gem 'rails_admin', :git => 'https://github.com/sferik/rails_admin.git'
 gem "airbrake"
+gem 'dalli'
 
 group :assets do
   gem 'sass-rails',   '~> 3.1.4'
@@ -26,7 +27,6 @@ group :development, :test do
 end
 group :production do
   gem 'pg'
-  gem 'dalli'
 end
 gem "devise"
 gem 'rack-google_analytics', :require => "rack/google_analytics"
