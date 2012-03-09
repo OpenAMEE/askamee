@@ -10,5 +10,6 @@ Askamee::Application.routes.draw do
 
   # Static API docs
   get "/api" => "static#api"
+  get "/widget" => "static#widget"
 
 end
