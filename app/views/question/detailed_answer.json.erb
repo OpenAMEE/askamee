@@ -3,6 +3,8 @@
 	"unit" : <%= (@pi ? "\"#{@amount[:unit]}\"".html_safe : 'null') %>, 
 	"type" : <%= (@pi ? "\"#{@amount[:type]}\"".html_safe : 'null') %>, 
 	"item" : <%= (@pi ? ('"'+@item.label+'"').html_safe : 'null') %>, 
+	"category" : "<%=  @category.meta.wikiname.gsub("_"," ") %>", 
+	"category_link" : "<%=  "http://discover.amee.com/categories/#{@category.meta.wikiname}" %>", 
 	"more_info" : "<%= @more_info_url %>", 
 	"item_uid" : <%= (@pi ? ('"'+@item.uid+'"').html_safe : 'null') %>, 
 	"inputs" : {
