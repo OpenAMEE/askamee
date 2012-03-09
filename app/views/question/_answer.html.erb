@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="span16">
+  <div class="span8">
     <h3>
       <% amount = @pi.amounts.find{|x| x[:default] == true}%>
       <%= number_with_precision amount[:value], :precision => 2, :delimiter => ',' %>
@@ -9,7 +9,7 @@
   </div>
 </div>
 <div class="row">
-  <div class="span9">
+  <div class="span6">
     <blockquote> 
       <p>
         based on 
@@ -26,9 +26,9 @@
       </p>
     </blockquote>
   </div>
-  <div class="span2">
+  <div class="span2 more-info-btn">
     <%= link_to "More info", 
                 @more_info_url,
-                :class => 'btn primary' %>
+                :class => 'btn btn-primary' %>
   </div>
 </div>

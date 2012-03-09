@@ -1,0 +1,51 @@
+<div class='hero-unit'>
+	<h1>Ask AMEE Javascript Widget</h1>
+</div>
+<p>
+	You can embed Ask AMEE directory into your own website using our Javascript widget.
+</p>
+<div class="alert alert-warning">
+	<p>
+		Note that this widget is HIGHLY EXPERIMENTAL and can change at any time (although we will try to maintain backwards compatibility). Use at your own risk.
+	</p>
+</div>
+
+<p>
+	Just pop this into your HTML...
+</p>
+
+<pre>
+<%= render(:partial => 'embed_js').gsub(' ',' ') %>
+</pre>
+
+<p>
+	And it comes out looking something like this (give it a try):
+</p>
+
+<%= render(:partial => 'embed_js') %>
+
+<h2>Customising Appearance</h2>
+<p>
+	If you want to customise the appearance of results, just add some rules to your CSS file.
+	The list of IDs below shows the <code>div</code> tags which are created to contain the loaded content.
+</p>
+<p>	
+	If you want full control over where content is placed, just precreate <code>div</code> tags with the right IDs in
+	your HTML, and the widget will insert content into those instead of creating its own. Make sure to add the widget
+	code to your page <strong>after</strong> the <code>div</code> tags.
+</p>
+
+<dl>
+	<dt>#askamee-search</dt>
+	<dd>The search box.
+	<dt>#askamee-results</dt>
+	<dd>The main results list. Will contain a <code>ul</code> with <code>li</code> tags for each result that has a numerical solution.
+	<dt>#askamee-other</dt>
+	<dd>A list of other categories that are of interest but do not have a numerical solution.
+</dl>
+
+
+<h2>jQuery</h2>
+<p>
+	The widget requires jQuery. If jQuery is not loaded, the script will autoload version 1.7.1 for you.
+</p>

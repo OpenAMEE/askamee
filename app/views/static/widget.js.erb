@@ -1,0 +1,107 @@
+// First, load jquery if we don't already have it available
+if (typeof jQuery === "undefined") {
+    var script_tag = document.createElement('script');
+    script_tag.setAttribute("type","text/javascript");
+    script_tag.setAttribute("src",
+      "http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
+    script_tag.onload = askamee_main; // Run main() once jQuery has loaded
+    script_tag.onreadystatechange = function () { // Same thing but for IE
+      if (this.readyState == 'complete' || this.readyState == 'loaded') askamee_main();
+    }
+    document.getElementsByTagName("head")[0].appendChild(script_tag);
+} else {
+    askamee_main();
+}
+
+var askamee_subqueries = [];
+
+function askamee_main() {
+	// Create DIVs
+	createIfMissing('askamee-other');
+	createIfMissing('askamee-results');
+	createIfMissing('askamee-search');
+	// Add content
+	setupSearchBox();
+}
+
+function createIfMissing(id) {
+	if ($('#'+id).length == 0) {
+		widget = $('#askamee-widget');
+		widget.after("<div id='"+id+"'></div>");
+	}	
+}
+
+function setupSearchBox() {
+	$('#askamee-search').append("<form id='askamee-form'><input id='askamee-query' type='text'><input type='submit' value='Ask AMEE'></form>");
+	$('#askamee-form').submit(function() {
+		query = $('#askamee-query')[0].value;
+		$('#askamee-results').html("<ul></ul>");
+		$('#askamee-other').hide();
+		$('#askamee-other').html("<p>These categories look relevant, but didn't quite match:</p><ul></ul>");
+	    jQuery.ajax({
+			dataType: 'script',
+			type:     'get',
+			url:      "http://<%= request.host %>/answer.json",
+			cache:    true,
+			data:     {
+				'q': query,
+				'callback': 'askamee_resultlist_loaded',
+				'subquery_callback': 'askamee_result_loaded'
+			}
+		});
+		return false;
+	});
+}
+
+// Handles the initial result list load
+function askamee_resultlist_loaded(results) {
+	askamee_subqueries = results['subqueries'];
+	doSubQuery();
+}
+
+// Perform the first subquery
+function doSubQuery() {
+	if (askamee_subqueries.length > 0) {
+		query = askamee_subqueries.shift();
+	    jQuery.ajax({
+			dataType: 'script',
+			type:     'get',
+			url:      query,
+			cache:    true,
+		});
+	}
+}
+
+// Handle subquery results
+function askamee_result_loaded(result) {
+	// Fire off the next query so it's working while we do the UI
+	doSubQuery();
+	// Display the result
+	if (result['answer']) {
+		result_html = "<li><span class='askamee-result-amount'>"
+		result_html += result['answer'] + ' ';
+		result_html += result['unit'] + ' ';
+		result_html += 'of ' + result['type'] + "</span>";
+		result_html += " <span class='askamee-more-info'><a href='"+result['more_info']+"'>More Info</a></span>";
+		result_html += '<br/>';
+		result_html += "<span class='askamee-result-details'>";
+		result_html += 'based on ' 
+		for (input in result['inputs']) {
+			result_html += "'" + input + "' being " + result['inputs'][input] + ', ';
+		} 
+		result_html += '<br/>';
+		result_html += "using the item '" + result['item'] + "'";
+		result_html += '<br/>';
+		result_html += "from the category <a href='"+result['category_link']+"'>" + result['category'] + "</a>.</span>";
+		result_html += "</li>";
+		$('#askamee-results ul').append(result_html);
+	}
+	else
+	{
+		result_html = "<li>"
+		result_html += "<a href='"+result['more_info']+"'>"+result['category']+"</a>";
+		result_html += "</li>";
+		$('#askamee-other ul').append(result_html);
+		$('#askamee-other').show();
+	}
+}
