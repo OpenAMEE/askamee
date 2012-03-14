@@ -1,1 +1,2 @@
-rvm 1.8.7@askamee
+# using the --create will make the gemset if it doesn't exist
+rvm 1.8.7@askamee --create

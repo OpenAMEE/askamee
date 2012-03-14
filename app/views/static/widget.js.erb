@@ -34,6 +34,7 @@ function createIfMissing(id) {
 function setupSearchBox() {
 	$('#askamee-search').append("<form id='askamee-form'><input id='askamee-query' type='text'><input type='submit' value='Ask AMEE'></form>");
 	$('#askamee-form').submit(function() {
+    $(this).find(':submit').attr('value', 'Loading…');
 		query = $('#askamee-query')[0].value;
 		$('#askamee-results').html("<ul></ul>");
 		$('#askamee-other').hide();
@@ -55,6 +56,8 @@ function setupSearchBox() {
 
 // Handles the initial result list load
 function askamee_resultlist_loaded(results) {
+  // reset the form text to show it's ready for another click
+  $('#askamee-form :submit')attr('value', 'Ask AMEE');
 	askamee_subqueries = results['subqueries'];
 	doSubQuery();
 }
