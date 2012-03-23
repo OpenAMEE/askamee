@@ -32,11 +32,13 @@ function createIfMissing(id) {
 }
 
 function setupSearchBox() {
-	$('#askamee-search').append("<form id='askamee-form'><input id='askamee-query' type='text'><input type='submit' value='Ask AMEE'></form>");
+	$('#askamee-search').append("<form id='askamee-form'><input id='askamee-query' type='text'><input type='submit' value='Ask AMEE'> <img id='askamee-spinner' src='http://ask.amee.com/assets/spinner.gif' style='display:none'></form><p id='askamee-error' style='display:none'>No results found. Maybe try a different question; make sure you include numbers, units and nouns.</div>");
 	$('#askamee-form').submit(function() {
 		query = $('#askamee-query')[0].value;
 		$('#askamee-results').html("<ul></ul>");
 		$('#askamee-other').hide();
+		$('#askamee-error').hide();
+		$('#askamee-spinner').show();
 		$('#askamee-other').html("<p>These categories look relevant, but didn't quite match:</p><ul></ul>");
 	    jQuery.ajax({
 			dataType: 'script',
@@ -69,6 +71,13 @@ function doSubQuery() {
 			url:      query,
 			cache:    true,
 		});
+	}
+	else {
+		// Finished - hide spinner
+		$('#askamee-spinner').hide();
+		// Display error if no results were found
+		if ($('#askamee-results ul li').length == 0)
+			$('#askamee-error').show();
 	}
 }
 
