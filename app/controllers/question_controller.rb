@@ -46,7 +46,7 @@ class QuestionController < ApplicationController
         # Allow two detailed response requests at a time
         @concurrency = 2
       }
-      format.json
+      format.json # return the API response
     end
     
   end
@@ -99,9 +99,9 @@ class QuestionController < ApplicationController
     
     respond_to do |format|
       format.js {
-        @message = thinking_message
+        @message = thinking_message # update the page with comedy messages while loading
       }
-      format.json
+      format.json # return the API response
     end
   end
   
