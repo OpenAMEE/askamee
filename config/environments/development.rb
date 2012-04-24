@@ -35,7 +35,7 @@ Askamee::Application.configure do
   config.middleware.use Rack::Cors do
     allow do
       origins '*'
-      resources '*', :headers => :any, :methods => :get
+      resource '*', :headers => :any, :methods => :get
     end  
   end
   

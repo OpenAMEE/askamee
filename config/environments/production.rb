@@ -59,5 +59,15 @@ Askamee::Application.configure do
   config.active_support.deprecation = :notify
   
   config.middleware.use("Rack::GoogleAnalytics", :web_property_id => "UA-24479591-6")
+
+  config.middleware.use Rack::Cors do
+    allow do
+      origins '*'
+      resource '*', :headers => :any, :methods => :get
+    end  
+  end
+
+
+
   
 end
