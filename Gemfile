@@ -12,6 +12,10 @@ gem 'rails_admin', :git => 'https://github.com/sferik/rails_admin.git'
 gem "airbrake"
 gem 'dalli'
 
+# Allow CORS requests in a browser
+gem 'rack-cors', :require => 'rack/cors'
+
+
 group :assets do
   gem 'sass-rails',   '~> 3.1.4'
   gem 'coffee-rails', '~> 3.1.1'

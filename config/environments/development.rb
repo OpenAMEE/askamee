@@ -32,4 +32,12 @@ Askamee::Application.configure do
   config.action_controller.perform_caching = false
   config.cache_store = :memory_store
 
+  config.middleware.use Rack::Cors do
+    allow do
+      origins '*'
+      resources '*', :headers => :any, :methods => :get
+    end  
+  end
+  
+
 end
