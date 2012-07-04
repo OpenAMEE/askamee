@@ -10,6 +10,7 @@ gem 'bootstrap-sass'
 gem 'fastercsv'
 gem 'rails_admin', :git => 'https://github.com/sferik/rails_admin.git'
 gem "airbrake"
+gem 'therubyracer'
 
 # Allow CORS requests in a browser
 gem 'rack-cors', :require => 'rack/cors'
